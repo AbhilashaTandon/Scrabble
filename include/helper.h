@@ -1,0 +1,57 @@
+#ifndef HELPER_H
+#define HELPER_H
+// Contains small helper functions and lookup tables used throughout the
+// codebase
+#include <cstdint>
+#include <string>
+#include <utility>
+
+typedef uint16_t score_t;
+typedef uint8_t tilecount_t;
+typedef uint8_t position_t;
+
+constexpr score_t tile_scores[28] = {0, 1, 3, 3, 2, 1, 4,  2,  4, 1,
+                                     8, 5, 1, 3, 1, 1, 3,  10, 1, 1,
+                                     1, 1, 4, 4, 8, 4, 10, 0};
+constexpr tilecount_t tile_freq[28] = {
+    0, 9, 2, 2, 4, 12, 2, 3, 2, 9, 1, 1, 4, 2,
+    6, 8, 2, 1, 6, 4,  6, 4, 2, 2, 1, 2, 1, 2}; // last one is blank
+// there might be a mistake here but whatever ill deal w that later
+
+enum Tile {
+        NONE,
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G,
+        H,
+        I,
+        J,
+        K,
+        L,
+        M,
+        N,
+        O,
+        P,
+        Q,
+        R,
+        S,
+        T,
+        U,
+        V,
+        W,
+        X,
+        Y,
+        Z,
+        BLANK
+};
+enum Square { EMPTY, DOUBLE_LETTER, TRIPLE_LETTER, DOUBLE_WORD, TRIPLE_WORD };
+
+typedef std::pair<Tile, position_t> tile_place_t;
+
+score_t get_score(std::string word);
+
+#endif
