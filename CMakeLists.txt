@@ -37,6 +37,9 @@ enable_testing()
 
 add_executable(
   scrabble_test
+  tests/helper.cpp
+  tests/board.cpp
+  tests/test_gtest.cpp
   ${SOURCES}
 )
 

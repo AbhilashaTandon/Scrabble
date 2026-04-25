@@ -158,6 +158,7 @@ src/board.o: src/board.cpp.o
 # target to build an object file
 src/board.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble.dir/build.make CMakeFiles/scrabble.dir/src/board.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble_test.dir/build.make CMakeFiles/scrabble_test.dir/src/board.cpp.o
 .PHONY : src/board.cpp.o
 
 src/board.i: src/board.cpp.i
@@ -166,6 +167,7 @@ src/board.i: src/board.cpp.i
 # target to preprocess a source file
 src/board.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble.dir/build.make CMakeFiles/scrabble.dir/src/board.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble_test.dir/build.make CMakeFiles/scrabble_test.dir/src/board.cpp.i
 .PHONY : src/board.cpp.i
 
 src/board.s: src/board.cpp.s
@@ -174,6 +176,7 @@ src/board.s: src/board.cpp.s
 # target to generate assembly for a file
 src/board.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble.dir/build.make CMakeFiles/scrabble.dir/src/board.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble_test.dir/build.make CMakeFiles/scrabble_test.dir/src/board.cpp.s
 .PHONY : src/board.cpp.s
 
 src/helper.o: src/helper.cpp.o
@@ -182,6 +185,7 @@ src/helper.o: src/helper.cpp.o
 # target to build an object file
 src/helper.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble.dir/build.make CMakeFiles/scrabble.dir/src/helper.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble_test.dir/build.make CMakeFiles/scrabble_test.dir/src/helper.cpp.o
 .PHONY : src/helper.cpp.o
 
 src/helper.i: src/helper.cpp.i
@@ -190,6 +194,7 @@ src/helper.i: src/helper.cpp.i
 # target to preprocess a source file
 src/helper.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble.dir/build.make CMakeFiles/scrabble.dir/src/helper.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble_test.dir/build.make CMakeFiles/scrabble_test.dir/src/helper.cpp.i
 .PHONY : src/helper.cpp.i
 
 src/helper.s: src/helper.cpp.s
@@ -198,6 +203,7 @@ src/helper.s: src/helper.cpp.s
 # target to generate assembly for a file
 src/helper.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble.dir/build.make CMakeFiles/scrabble.dir/src/helper.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble_test.dir/build.make CMakeFiles/scrabble_test.dir/src/helper.cpp.s
 .PHONY : src/helper.cpp.s
 
 src/main.o: src/main.cpp.o
@@ -230,6 +236,7 @@ src/wordlist.o: src/wordlist.cpp.o
 # target to build an object file
 src/wordlist.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble.dir/build.make CMakeFiles/scrabble.dir/src/wordlist.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble_test.dir/build.make CMakeFiles/scrabble_test.dir/src/wordlist.cpp.o
 .PHONY : src/wordlist.cpp.o
 
 src/wordlist.i: src/wordlist.cpp.i
@@ -238,6 +245,7 @@ src/wordlist.i: src/wordlist.cpp.i
 # target to preprocess a source file
 src/wordlist.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble.dir/build.make CMakeFiles/scrabble.dir/src/wordlist.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble_test.dir/build.make CMakeFiles/scrabble_test.dir/src/wordlist.cpp.i
 .PHONY : src/wordlist.cpp.i
 
 src/wordlist.s: src/wordlist.cpp.s
@@ -246,7 +254,32 @@ src/wordlist.s: src/wordlist.cpp.s
 # target to generate assembly for a file
 src/wordlist.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble.dir/build.make CMakeFiles/scrabble.dir/src/wordlist.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble_test.dir/build.make CMakeFiles/scrabble_test.dir/src/wordlist.cpp.s
 .PHONY : src/wordlist.cpp.s
+
+tests/helper.o: tests/helper.cpp.o
+.PHONY : tests/helper.o
+
+# target to build an object file
+tests/helper.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble_test.dir/build.make CMakeFiles/scrabble_test.dir/tests/helper.cpp.o
+.PHONY : tests/helper.cpp.o
+
+tests/helper.i: tests/helper.cpp.i
+.PHONY : tests/helper.i
+
+# target to preprocess a source file
+tests/helper.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble_test.dir/build.make CMakeFiles/scrabble_test.dir/tests/helper.cpp.i
+.PHONY : tests/helper.cpp.i
+
+tests/helper.s: tests/helper.cpp.s
+.PHONY : tests/helper.s
+
+# target to generate assembly for a file
+tests/helper.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/scrabble_test.dir/build.make CMakeFiles/scrabble_test.dir/tests/helper.cpp.s
+.PHONY : tests/helper.cpp.s
 
 tests/test_gtest.o: tests/test_gtest.cpp.o
 .PHONY : tests/test_gtest.o
@@ -295,6 +328,9 @@ help:
 	@echo "... src/wordlist.o"
 	@echo "... src/wordlist.i"
 	@echo "... src/wordlist.s"
+	@echo "... tests/helper.o"
+	@echo "... tests/helper.i"
+	@echo "... tests/helper.s"
 	@echo "... tests/test_gtest.o"
 	@echo "... tests/test_gtest.i"
 	@echo "... tests/test_gtest.s"
