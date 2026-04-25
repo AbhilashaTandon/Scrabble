@@ -9,6 +9,7 @@
 typedef uint16_t score_t;
 typedef uint8_t tilecount_t;
 typedef uint8_t position_t;
+typedef std::pair<uint8_t, uint8_t> coords_t;
 
 constexpr score_t tile_scores[28] = {0, 1, 3, 3, 2, 1, 4,  2,  4, 1,
                                      8, 5, 1, 3, 1, 1, 3,  10, 1, 1,
@@ -103,7 +104,7 @@ constexpr Square board_layout[225] = {
 
 score_t get_score(std::string word);
 
-std::pair<uint8_t, uint8_t> get_xy(position_t pos);
+coords_t get_xy(position_t pos);
 
 position_t get_pos(int x, int y);
 
