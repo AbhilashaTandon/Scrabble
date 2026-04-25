@@ -54,4 +54,59 @@ typedef std::pair<Tile, position_t> tile_place_t;
 
 score_t get_score(std::string word);
 
+constexpr Square board_layout[225] = {
+    TRIPLE_WORD,   EMPTY,         EMPTY,         DOUBLE_LETTER, EMPTY,
+    EMPTY,         EMPTY,         TRIPLE_WORD,   EMPTY,         EMPTY,
+    EMPTY,         DOUBLE_LETTER, EMPTY,         EMPTY,         TRIPLE_WORD,
+    EMPTY,         DOUBLE_WORD,   EMPTY,         EMPTY,         EMPTY,
+    TRIPLE_LETTER, EMPTY,         EMPTY,         EMPTY,         TRIPLE_LETTER,
+    EMPTY,         EMPTY,         EMPTY,         DOUBLE_WORD,   EMPTY,
+    EMPTY,         EMPTY,         DOUBLE_WORD,   EMPTY,         EMPTY,
+    EMPTY,         DOUBLE_LETTER, EMPTY,         DOUBLE_LETTER, EMPTY,
+    EMPTY,         EMPTY,         DOUBLE_WORD,   EMPTY,         EMPTY,
+    DOUBLE_LETTER, EMPTY,         EMPTY,         DOUBLE_WORD,   EMPTY,
+    EMPTY,         EMPTY,         DOUBLE_LETTER, EMPTY,         EMPTY,
+    EMPTY,         DOUBLE_WORD,   EMPTY,         EMPTY,         DOUBLE_LETTER,
+    EMPTY,         EMPTY,         EMPTY,         EMPTY,         DOUBLE_WORD,
+    EMPTY,         EMPTY,         EMPTY,         EMPTY,         EMPTY,
+    DOUBLE_WORD,   EMPTY,         EMPTY,         EMPTY,         EMPTY,
+    EMPTY,         TRIPLE_LETTER, EMPTY,         EMPTY,         EMPTY,
+    TRIPLE_LETTER, EMPTY,         EMPTY,         EMPTY,         TRIPLE_LETTER,
+    EMPTY,         EMPTY,         EMPTY,         TRIPLE_LETTER, EMPTY,
+    EMPTY,         EMPTY,         DOUBLE_LETTER, EMPTY,         EMPTY,
+    EMPTY,         DOUBLE_LETTER, EMPTY,         DOUBLE_LETTER, EMPTY,
+    EMPTY,         EMPTY,         DOUBLE_LETTER, EMPTY,         EMPTY,
+    TRIPLE_WORD,   EMPTY,         EMPTY,         DOUBLE_LETTER, EMPTY,
+    EMPTY,         EMPTY,         DOUBLE_WORD,   EMPTY,         EMPTY,
+    EMPTY,         DOUBLE_LETTER, EMPTY,         EMPTY,         TRIPLE_WORD,
+    EMPTY,         EMPTY,         DOUBLE_LETTER, EMPTY,         EMPTY,
+    EMPTY,         DOUBLE_LETTER, EMPTY,         DOUBLE_LETTER, EMPTY,
+    EMPTY,         EMPTY,         DOUBLE_LETTER, EMPTY,         EMPTY,
+    EMPTY,         TRIPLE_LETTER, EMPTY,         EMPTY,         EMPTY,
+    TRIPLE_LETTER, EMPTY,         EMPTY,         EMPTY,         TRIPLE_LETTER,
+    EMPTY,         EMPTY,         EMPTY,         TRIPLE_LETTER, EMPTY,
+    EMPTY,         EMPTY,         EMPTY,         EMPTY,         DOUBLE_WORD,
+    EMPTY,         EMPTY,         EMPTY,         EMPTY,         EMPTY,
+    DOUBLE_WORD,   EMPTY,         EMPTY,         EMPTY,         EMPTY,
+    DOUBLE_LETTER, EMPTY,         EMPTY,         DOUBLE_WORD,   EMPTY,
+    EMPTY,         EMPTY,         DOUBLE_LETTER, EMPTY,         EMPTY,
+    EMPTY,         DOUBLE_WORD,   EMPTY,         EMPTY,         DOUBLE_LETTER,
+    EMPTY,         EMPTY,         DOUBLE_WORD,   EMPTY,         EMPTY,
+    EMPTY,         DOUBLE_LETTER, EMPTY,         DOUBLE_LETTER, EMPTY,
+    EMPTY,         EMPTY,         DOUBLE_WORD,   EMPTY,         EMPTY,
+    EMPTY,         DOUBLE_WORD,   EMPTY,         EMPTY,         EMPTY,
+    TRIPLE_LETTER, EMPTY,         EMPTY,         EMPTY,         TRIPLE_LETTER,
+    EMPTY,         EMPTY,         EMPTY,         DOUBLE_WORD,   EMPTY,
+    TRIPLE_WORD,   EMPTY,         EMPTY,         DOUBLE_LETTER, EMPTY,
+    EMPTY,         EMPTY,         TRIPLE_WORD,   EMPTY,         EMPTY,
+    EMPTY,         DOUBLE_LETTER, EMPTY,         EMPTY,         TRIPLE_WORD};
+
+score_t get_score(std::string word);
+
+std::pair<uint8_t, uint8_t> get_xy(position_t pos);
+
+position_t get_pos(int x, int y);
+
+
+
 #endif
