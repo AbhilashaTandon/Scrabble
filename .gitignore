@@ -1,3 +1,7 @@
 build/
 wordlist.py
-
+*.cmake
+CMakeCache.txt
+Makefile
+CMakeFiles
+bin/
