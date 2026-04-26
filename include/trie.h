@@ -7,9 +7,11 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <span>
 
 struct Node{
         int wordlist_idx;
+        int num_words;
         struct Node *left;
         // left will always contain words that have letter
         struct Node *right;
@@ -20,9 +22,9 @@ struct Node{
 class Trie {
 public:
         Trie(std::string file_path);
-        std::vector<std::string> get_words(std::vector<Tile> available);
+        std::span<std::string> get_words(std::vector<Tile> available);
 private:
         struct Node root;
-        std::vector<std::vector<std::string>> wordlist; //holds all words so nodes can index them
+        std::vector<std::string> wordlist; //holds all words so nodes can index them
 };
 #endif
