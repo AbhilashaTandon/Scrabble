@@ -1,3 +1,4 @@
-cmake -B build
-cmake --build build
-./build/bin/scrabble_test
+cd ./bin
+cmake ./../
+cmake --build . --target scrabble_test
+./scrabble_test

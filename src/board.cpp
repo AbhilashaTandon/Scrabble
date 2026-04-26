@@ -3,24 +3,27 @@
 #include "../include/print.h"
 #include "../include/wordlist.h"
 #include <cassert>
+#include <codecvt>
 #include <cstdio>
 #include <ctime>
+#include <deque>
 #include <iostream>
-#include <vector>
-#include <string>
 #include <locale>
-#include <codecvt>
+#include <string>
+#include <vector>
 
 #define min(x, y) ((x) < (y)) ? (x) : (y)
 #define max(x, y) ((x) > (y)) ? (x) : (y)
 
 Board::Board(std::string wordlist_file_path) : wordlist(wordlist_file_path) {
+
         for (int i = 0; i < 28; i++) {
                 tilecount_t count = tile_freq[i];
                 for (tilecount_t j = 0; j < count; j++) {
                         bag.push_back((Tile)i);
                 }
         }
+
         for (int i = 0; i < 225; i++) {
                 board[i] = NONE;
         }
@@ -34,31 +37,103 @@ Board::Board(std::string wordlist_file_path) : wordlist(wordlist_file_path) {
                 rack_a[i] = draw_a[i];
                 rack_b[i] = draw_b[i];
         }
+
+        this->wordlist = WordList(wordlist_file_path);
 }
+
+bool Board::contains(std::string word) const { return wordlist.contains(word); }
 
 bool Board::check_valid_words(position_t p) {
         // check horizontal word
-        std::string horiz = "";
+        std::deque<char> horiz;
         coords_t coords = get_xy(p);
+        int horiz_len = 0;
+        int x_coord = coords.first;
+        int y_coord = coords.second;
 
-        int x_word_start = coords.first; // find first char of horizontal word
-        while (x_word_start >= 0 && board[x_word_start] != NONE) {
-                char add_to_front = board[x_word_start] + '@';
-                horiz.insert(horiz.begin(), add_to_front);
+        int x_word_start = x_coord; // find first char of horizontal word
+        while (x_word_start >= 0 &&
+               board[get_pos(x_word_start, y_coord)] != NONE) {
+                char add_to_front =
+                    char(board[get_pos(x_word_start, y_coord)]) + '@';
+                horiz.push_front(add_to_front);
                 x_word_start--;
-        };
+                horiz_len++;
+                // std::cout << add_to_front << " " << x_word_start << '\n';
+        }
+
         x_word_start++;
 
-        int x_word_end = coords.first; // find last char of horizontal word
-        while (x_word_end >= 0 && board[x_word_end] != NONE) {
-
-                char add_to_back = board[x_word_start] + '@';
-                horiz.insert(horiz.begin(), add_to_back);
+        int x_word_end = x_coord + 1; // find last char of horizontal word
+        while (x_word_end < 15 && board[get_pos(x_word_end, y_coord)] != NONE) {
+                char add_to_back =
+                    char(board[get_pos(x_word_end, y_coord)]) + '@';
+                horiz.push_back(add_to_back);
                 x_word_end++;
-        };
+                horiz_len++;
+                // std::cout << add_to_back << " " << x_word_end << '\n';
+        }
+
         x_word_end--;
 
-        std::cout << horiz;
+        if (horiz_len >= 2) {
+                // single tiles don't count as words
+                std::string horiz_str = "";
+                for (char c : horiz) {
+                        horiz_str += c;
+                }
+
+                if (!contains(horiz_str)) {
+                        std::cerr << "Error (horizontal): \"" << horiz_str
+                                  << "\" is not a valid word." << '\n';
+                        std::cerr << x_word_start << " " << x_word_end << " "
+                                  << y_coord << '\n';
+                        return false;
+                }
+        }
+
+        // check horizontal word
+        std::deque<char> vert;
+        int vert_len = 0;
+
+        int y_word_start = y_coord; // find first char of vertical word
+        while (y_word_start >= 0 &&
+               board[get_pos(x_coord, y_word_start)] != NONE) {
+                char add_to_front =
+                    char(board[get_pos(x_coord, y_word_start)]) + '@';
+                vert.push_front(add_to_front);
+                y_word_start--;
+                vert_len++;
+        }
+
+        y_word_start++;
+
+        int y_word_end = y_coord + 1; // find last char of vertical word
+        while (y_word_end < 15 && board[get_pos(x_coord, y_word_end)] != NONE) {
+                char add_to_back =
+                    char(board[get_pos(x_coord, y_word_end)]) + '@';
+                vert.push_back(add_to_back);
+                y_word_end++;
+                vert_len++;
+        }
+
+        y_word_end--;
+
+        if (vert_len >= 2) {
+                // single tiles don't count as words
+                std::string vert_str = "";
+                for (char c : vert) {
+                        vert_str += c;
+                }
+
+                if (!contains(vert_str)) {
+                        std::cerr << "Error (vertical): \"" << vert_str
+                                  << "\" is not a valid word.";
+                        std::cerr << y_word_start << " " << y_word_end << " "
+                                  << x_coord << '\n';
+                        return false;
+                }
+        }
 
         return true;
 }
@@ -74,28 +149,85 @@ bool Board::make_play(std::array<tile_place_t, 7> play) {
 
         for (int i = 0; i < 7; i++) {
                 position_t p = play[i].second;
+                if (play[i].first == NONE) {
+                        continue;
+                }
+                if (board[p] != NONE) {
+                        std::cerr << "Error: cannot place tile, tile is "
+                                     "already present."
+                                  << '\n';
+                        return false;
+                }
                 coords_t coords = get_xy(p);
                 min_x = min(min_x, coords.first);
                 max_x = max(max_x, coords.first);
                 min_y = min(min_y, coords.second);
                 max_y = max(max_y, coords.second);
+                for (int j = 0; j < i; j++) {
+                        if (play[j].first == NONE) {
+                                continue;
+                        }
+                        if (p == play[j].second) {
+                                std::cerr << "Overlapping tiles" << '\n';
+                                return false;
+                        }
+                }
         }
 
-        if ((min_x != max_x) && (min_y != max_y)) {
+        bool vertical = min_x == max_x; //only takes up one x coord
+        // we can have both min_x == max_x and min_y == max_y if the player played one tile 
+
+        if(!vertical && (min_y != max_y)){
+                std::cerr << "Tiles not in one row or column" << '\n';
                 return false;
-                // all tiles must be in one row or column
         }
 
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 7; i++) { // add in tiles
                 Tile t = play[i].first;
+                if (t == NONE) {
+                        continue;
+                }
                 position_t p = play[i].second;
                 board[p] = t;
         }
 
-        for (int i = 0; i < 7; i++) {
-                if (!check_valid_words(play[i].second)) {
-                        return false;
+        //check that all tiles are part of one word
+        
+        if(vertical){
+                for(int y = min_y; y <= max_y; y++){
+                        if(board[get_pos(min_x, y)] == NONE){
+                                std::cerr << "Gap in main vertical word at " << min_x << " " << y << " " << '\n';
+                                return false;
+                                //if gap in main word played
+                        }
                 }
+        }
+
+        else{
+                for(int x = min_x; x <= max_x; x++){
+                        if(board[get_pos(x, min_y)] == NONE){
+                                std::cerr << "Gap in main horizontal word at " << x << " " << min_y << " " << '\n';
+                                return false;
+                                //if gap in main word played
+                        }
+                }
+        }
+
+        for (int i = 0; i < 7; i++) {
+                if (play[i].first == NONE) {
+                        continue;
+                }
+                if (check_valid_words(play[i].second)) {
+                        continue;
+                }
+                for (int j = 0; j < 7; j++) { // remove tiles if invalid word
+                        if (play[j].first == NONE) {
+                                continue;
+                        }
+                        position_t p = play[j].second;
+                        board[p] = Tile::NONE;
+                }
+                return false;
         }
 
         return true;

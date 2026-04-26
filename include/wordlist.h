@@ -11,5 +11,7 @@ class WordList {
 
       private:
         std::set<std::string> wordlist;
+
+
 };
 #endif
