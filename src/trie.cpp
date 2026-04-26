@@ -49,7 +49,6 @@ Trie::Trie(std::string file_path) {
 std::span<std::string> Trie::get_words(std::vector<Tile> available) {
         struct Node *current = &this->root;
         while (true) {
-
                 if (current->letter == NONE) {
                         return std::span(wordlist.data() +
                                              current->wordlist_idx + 1,

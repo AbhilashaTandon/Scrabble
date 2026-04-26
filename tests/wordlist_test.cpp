@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 TEST(WordlistTests, WordTests) {
-        WordList w = WordList("../wordlists/NWL2023-modified.txt");
+        WordList w = WordList("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt");
         ASSERT_TRUE(w.contains("AA"));
         ASSERT_TRUE(w.contains("AB"));
         ASSERT_TRUE(w.contains("CAKE"));
@@ -14,7 +14,7 @@ TEST(WordlistTests, WordTests) {
 }
 
 TEST(WordlistTests, BoardTests) {
-        Board b = Board("../wordlists/NWL2023-modified.txt");
+        Board b = Board("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt");
         ASSERT_TRUE(b.contains("AA"));
         ASSERT_TRUE(b.contains("AB"));
         ASSERT_TRUE(b.contains("CAKE"));
