@@ -7,11 +7,11 @@ int main() {
 
         Trie t = Trie("../wordlists/trie.txt");
 
-        std::vector<Tile> rack = {A, C, A, F, D, E, L};
+        std::vector<Tile> rack = {A, B, S, C, O, N, D};
 
-        // for(auto word : t.get_words(rack)){
-        //         std::cout << word << '\n';
-        // }
+        for(auto word : t.get_words(rack)){
+                std::cout << '\n' << word;
+        }
 
         return 0;
 }

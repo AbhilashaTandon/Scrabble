@@ -26,5 +26,9 @@ public:
 private:
         struct Node root;
         std::vector<std::string> wordlist; //holds all words so nodes can index them
+        std::vector<std::string> parse_trie_file(std::string file_path);
 };
+
+void print(struct Node*);
+
 #endif
