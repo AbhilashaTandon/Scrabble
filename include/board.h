@@ -8,7 +8,7 @@
 
 class Board {
       public:
-        Board(std::string wordlist_file_path);
+        Board(std::string wordlist_file_path, std::string trie_file_path);
         bool make_play(std::array<tile_place_t, 7>);
         void print() const;
         bool contains(std::string word) const;

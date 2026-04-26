@@ -15,7 +15,7 @@
 #define min(x, y) ((x) < (y)) ? (x) : (y)
 #define max(x, y) ((x) > (y)) ? (x) : (y)
 
-Board::Board(std::string wordlist_file_path) : wordlist(wordlist_file_path) {
+Board::Board(std::string wordlist_file_path, std::string trie_file_path) : wordlist(wordlist_file_path, trie_file_path) {
 
         for (int i = 0; i < 28; i++) {
                 tilecount_t count = tile_freq[i];
@@ -38,7 +38,6 @@ Board::Board(std::string wordlist_file_path) : wordlist(wordlist_file_path) {
                 rack_b[i] = draw_b[i];
         }
 
-        this->wordlist = WordList(wordlist_file_path);
 }
 
 bool Board::contains(std::string word) const { return wordlist.contains(word); }
@@ -249,6 +248,7 @@ void Board::print() const {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
 
         // print rack for player A
+        std::cout << "^[[2J"; //clears screen
 
         for (int i = 0; i < 17; i++) {
                 std::cout << " ";

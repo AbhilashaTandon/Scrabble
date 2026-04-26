@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string>
 #include <utility>
+#include <vector>
 
 typedef uint16_t score_t;
 typedef uint8_t tilecount_t;
@@ -108,6 +109,6 @@ coords_t get_xy(position_t pos);
 
 position_t get_pos(int x, int y);
 
-
+uint32_t get_bitmask(std::vector<Tile> tiles);
 
 #endif

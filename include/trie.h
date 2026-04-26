@@ -2,7 +2,6 @@
 #ifndef TRIE_H
 #define TRIE_H
 #include "helper.h"
-#include "wordlist.h"
 #include <array>
 #include <cstdint>
 #include <vector>
