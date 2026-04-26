@@ -63,11 +63,15 @@ target_compile_options(scrabble_test PUBLIC -Wall -Wextra -Wpedantic -g -O0)
 
 
 find_package(GTest REQUIRED)
+find_package(benchmark REQUIRED)
 
 target_link_libraries(
   scrabble_test
   GTest::gtest_main
 )
+
+target_link_libraries(scrabble_test benchmark::benchmark)
+target_link_libraries(scrabble_debug benchmark::benchmark)
 
 include(GoogleTest)
 gtest_discover_tests(scrabble_test)
