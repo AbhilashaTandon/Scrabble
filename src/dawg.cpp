@@ -42,12 +42,15 @@ Dawg::Dawg(std::string file_path) : start(Tile::START), end(Tile::END) {
                 }
 
                 add_word(word);
+                print(&end, "", false, false);
+                print(&start, "", false, true);
+                std::cout << "-------------------------------------------------"
+                             "-----------------------------"
+                          << "\n\n\n";
         }
 
         compress();
-        print(&end, "", false);
 }
-
 
 void Dawg::add_word(std::string word) {
         DawgNode *current = &this->start;
@@ -77,7 +80,6 @@ void Dawg::add_word(std::string word) {
 
         assert(this->start.children.size() != 0);
 }
-
 
 bool Dawg::contains(std::string word) {
         DawgNode *current = &this->start;
@@ -112,7 +114,8 @@ bool Dawg::contains(std::string word) {
         return false;
 }
 
-void Dawg::print(DawgNode *current, std::string indent, bool is_last) {
+void Dawg::print(DawgNode *current, std::string indent, bool is_last,
+                 bool forwards) {
         std::cout << indent;
         if (is_last) {
                 std::cout << "└─";
@@ -123,54 +126,70 @@ void Dawg::print(DawgNode *current, std::string indent, bool is_last) {
         }
         std::cout << char(current->t + 64) << '\n';
 
-        for (size_t i = 0; i < current->parents.size(); i++) {
-                print(current->parents[i], indent,
-                      i == current->parents.size() - 1);
+        if (forwards) {
+                for (size_t i = 0; i < current->children.size(); i++) {
+                        print(current->children[i], indent,
+                              i == current->children.size() - 1, forwards);
+                }
+        } else {
+                for (size_t i = 0; i < current->parents.size(); i++) {
+                        print(current->parents[i], indent,
+                              i == current->parents.size() - 1, forwards);
+                }
         }
 }
 
-void Dawg::compress(){
-        compress_recurse(&end);
-}
+void Dawg::compress() { compress_recurse(&this->end); }
 
-void Dawg::compress_recurse(DawgNode* d){
-        if(d->parents.size() == 0){
+void Dawg::compress_recurse(DawgNode *d) {
+        if (d->parents.size() == 0) {
                 return;
         }
-        std::unordered_map<Tile, DawgNode*> preceding_tiles = std::unordered_map<Tile, DawgNode*>();
+        std::unordered_map<Tile, DawgNode *> preceding_tiles =
+            std::unordered_map<Tile, DawgNode *>();
 
-        for(DawgNode * parent : d->parents){
-                if(parent->t == START){
-                        //there's only one start node so we don't need to merge
+        for (DawgNode *parent : d->parents) {
+                std::cout << char(parent->t + 64) << " ";
+                if (parent->t == START) {
+                        // there's only one start node so we don't need to merge
                         continue;
                 }
                 auto lookup = preceding_tiles.find(parent->t);
 
-                if(lookup == preceding_tiles.end()){
-                        //add first node to map, and then replace later nodes with it
+                if (lookup == preceding_tiles.end()) {
+                        // add first node to map, and then replace later nodes
+                        // with it
                         preceding_tiles.insert({parent->t, parent});
                         continue;
                 }
 
-
                 DawgNode *replacement = lookup->second;
-                assert(!replacement->equivalent(parent));
-                for(DawgNode *parent_of_parent: parent->parents){
+                // assert(!replacement->equivalent(parent));
+                for (DawgNode *parent_of_parent : parent->parents) {
                         replacement->parents.push_back(parent_of_parent);
-                        // std::cout << parent_of_parent->t << " " << parent->t << '\n';
-                        // auto index = std::find(parent_of_parent->children.begin(), parent_of_parent->children.end(), parent);
+                        // std::cout << parent_of_parent->t << " " << parent->t
+                        // << '\n'; auto index =
+                        // std::find(parent_of_parent->children.begin(),
+                        // parent_of_parent->children.end(), parent);
                         // assert(index != parent_of_parent->children.end());
                         // parent_of_parent->children.erase(index);
                         // parent_of_parent->children.push_back(replacement);
-                        //update parents of this node to point to the one we saved before
+                        // update parents of this node to point to the one we
+                        // saved before
                 }
-                
-
+                delete parent;
         }
-        d->parents.clear();
 
-        for(auto node : preceding_tiles){
+        d->parents.clear();
+        std::cout << " | ";
+
+        for (auto node : preceding_tiles) {
+                std::cout << char(node.first + 64) << " ";
                 d->parents.push_back(node.second);
+        }
+        std::cout << '\n';
+
+        for (auto node : preceding_tiles) {
                 compress_recurse(node.second);
         }
 }

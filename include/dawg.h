@@ -23,7 +23,7 @@ class Dawg {
       public:
         Dawg(std::string wordlist_file_path);
         bool contains(std::string word);
-        void print(DawgNode *current, std::string indent, bool is_last);
+        void print(DawgNode *current, std::string indent, bool is_last, bool forwards);
 
       private:
         DawgNode start;
