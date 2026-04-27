@@ -7,6 +7,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 DawgNode::DawgNode(Tile t) {
         parents = std::vector<DawgNode *>();
@@ -40,22 +41,15 @@ Dawg::Dawg(std::string file_path) : start(Tile::START), end(Tile::END) {
                         continue;
                 }
 
-                std::set<DawgNode *> *reg = new std::set<DawgNode *>();
-                add_word(word, reg);
-                // print(&start, "", false);
+                add_word(word);
         }
-        print(&end, "", false);
 
-        // for (DawgNode *d : this->end.parents) {
-        //         std::cout << char(d->t + 64);
-        // }
+        compress();
+        print(&end, "", false);
 }
 
-// algorithm based on this paper
-// https://aclanthology.org/J00-1002.pdf
-// Incremental Construction of Minimal Acyclic Finite-State Automata
 
-void Dawg::add_word(std::string word, std::set<DawgNode *> *reg) {
+void Dawg::add_word(std::string word) {
         DawgNode *current = &this->start;
         for (char c : word) {
                 assert(isupper(c));
@@ -72,15 +66,6 @@ void Dawg::add_word(std::string word, std::set<DawgNode *> *reg) {
                         current = next;
                         continue;
                 }
-                if (current->children.size() > 1) {
-                        // std::cout << "replace or register" << '\n';
-                        replace_or_register(current, reg);
-                }
-                if (current->children.size() == 1 &&
-                    current->children[0]->t != END) {
-                        replace_or_register(current, reg);
-                }
-                // std::cout << "make new node" << '\n';
                 next = new DawgNode(Tile(c - 64));
                 current->children.push_back(next);
                 next->parents.push_back(current);
@@ -91,49 +76,8 @@ void Dawg::add_word(std::string word, std::set<DawgNode *> *reg) {
         end.parents.push_back(current);
 
         assert(this->start.children.size() != 0);
-        replace_or_register(&this->start, reg);
-
-        // current->children.push_back(&this->end);
-        // end.parents.push_back(current);
 }
 
-void Dawg::replace_or_register(DawgNode *state, std::set<DawgNode *> *reg) {
-        assert(state != NULL);
-        assert(state->children.size() != 0);
-        DawgNode *last_child = state->children.back();
-        if (last_child->children.size() > 1) {
-                replace_or_register(last_child, reg);
-        }
-        if (last_child->children.size() == 1 &&
-            last_child->children[0]->t != END) {
-                replace_or_register(last_child, reg);
-        }
-        for (DawgNode *q : *reg) {
-                if (q->equivalent(last_child)) {
-                        for (DawgNode *child : last_child->children) {
-                                std::vector<DawgNode *> parents =
-                                    child->parents;
-                                parents.erase(std::remove(parents.begin(),
-                                                          parents.end(),
-                                                          last_child),
-                                              parents.end());
-                                parents.push_back(q);
-                        }
-                        for (DawgNode *parent : last_child->parents) {
-                                std::vector<DawgNode *> children =
-                                    parent->children;
-                                children.erase(std::remove(children.begin(),
-                                                           children.end(),
-                                                           last_child),
-                                               children.end());
-                                children.push_back(q);
-                                q->parents.push_back(parent);
-                        }
-                        return;
-                }
-        }
-        reg->insert(last_child);
-}
 
 bool Dawg::contains(std::string word) {
         DawgNode *current = &this->start;
@@ -182,5 +126,51 @@ void Dawg::print(DawgNode *current, std::string indent, bool is_last) {
         for (size_t i = 0; i < current->parents.size(); i++) {
                 print(current->parents[i], indent,
                       i == current->parents.size() - 1);
+        }
+}
+
+void Dawg::compress(){
+        compress_recurse(&end);
+}
+
+void Dawg::compress_recurse(DawgNode* d){
+        if(d->parents.size() == 0){
+                return;
+        }
+        std::unordered_map<Tile, DawgNode*> preceding_tiles = std::unordered_map<Tile, DawgNode*>();
+
+        for(DawgNode * parent : d->parents){
+                if(parent->t == START){
+                        //there's only one start node so we don't need to merge
+                        continue;
+                }
+                auto lookup = preceding_tiles.find(parent->t);
+
+                if(lookup == preceding_tiles.end()){
+                        //add first node to map, and then replace later nodes with it
+                        preceding_tiles.insert({parent->t, parent});
+                        continue;
+                }
+
+
+                DawgNode *replacement = lookup->second;
+                assert(!replacement->equivalent(parent));
+                for(DawgNode *parent_of_parent: parent->parents){
+                        replacement->parents.push_back(parent_of_parent);
+                        // std::cout << parent_of_parent->t << " " << parent->t << '\n';
+                        // auto index = std::find(parent_of_parent->children.begin(), parent_of_parent->children.end(), parent);
+                        // assert(index != parent_of_parent->children.end());
+                        // parent_of_parent->children.erase(index);
+                        // parent_of_parent->children.push_back(replacement);
+                        //update parents of this node to point to the one we saved before
+                }
+                
+
+        }
+        d->parents.clear();
+
+        for(auto node : preceding_tiles){
+                d->parents.push_back(node.second);
+                compress_recurse(node.second);
         }
 }

@@ -28,8 +28,9 @@ class Dawg {
       private:
         DawgNode start;
         DawgNode end;
-        void add_word(std::string word, std::set<DawgNode *> *reg);
-        void replace_or_register(DawgNode *state, std::set<DawgNode *> *reg);
+        void add_word(std::string word);
+        void compress();
+        void compress_recurse(DawgNode *d);
 };
 
 #endif
