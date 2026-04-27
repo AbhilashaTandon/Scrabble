@@ -8,12 +8,12 @@
 #include <string>
 #include <span>
 
-struct Node{
+struct TrieNode{
         int wordlist_idx;
         int num_words;
-        struct Node *left;
+        struct TrieNode *left;
         // left will always contain words that have letter
-        struct Node *right;
+        struct TrieNode *right;
         // right will always contain words that lack letter
         Tile letter;
 };
@@ -23,11 +23,11 @@ public:
         Trie(std::string file_path);
         std::span<std::string> get_words(std::vector<Tile> available);
 private:
-        struct Node root;
+        struct TrieNode root;
         std::vector<std::string> wordlist; //holds all words so nodes can index them
         std::vector<std::string> parse_trie_file(std::string file_path);
 };
 
-void print(struct Node*);
+void print(struct TrieNode*);
 
 #endif

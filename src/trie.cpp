@@ -9,7 +9,7 @@
 #include <sstream>
 #include <string>
 
-void print(struct Node *node) {
+void print(struct TrieNode *node) {
         if (node->letter != NONE) {
                 std::cout << char(node->letter + 64) << " ";
         }
@@ -26,11 +26,11 @@ Trie::Trie(std::string file_path) {
         wordlist = parse_trie_file(file_path);
 
         std::cout << "All words loaded" << "\n";
-        std::queue<struct Node *> ancestors = std::queue<struct Node *>();
+        std::queue<struct TrieNode *> ancestors = std::queue<struct TrieNode *>();
         ancestors.push(&this->root);
 
         while (!ancestors.empty()) {
-                struct Node *current = ancestors.front();
+                struct TrieNode *current = ancestors.front();
                 ancestors.pop();
                 if (current->letter == NONE) {
                         assert(current->left == NULL);
@@ -47,7 +47,7 @@ Trie::Trie(std::string file_path) {
 }
 
 std::span<std::string> Trie::get_words(std::vector<Tile> available) {
-        struct Node *current = &this->root;
+        struct TrieNode *current = &this->root;
         while (true) {
                 if (current->letter == NONE) {
                         return std::span(wordlist.data() +
@@ -113,7 +113,7 @@ std::vector<std::string> Trie::parse_trie_file(std::string file_path) {
                         words.push_back(next_word);
                 }
 
-                struct Node *current = &this->root;
+                struct TrieNode *current = &this->root;
                 for (char c : tree_path) {
                         // build tree
                         Tile t = isupper(c) ? Tile(c - 64) : Tile(c - 96);
@@ -125,7 +125,7 @@ std::vector<std::string> Trie::parse_trie_file(std::string file_path) {
 
                         if (isupper(c)) {
                                 if (current->left == NULL) {
-                                        struct Node *child = new struct Node(
+                                        struct TrieNode *child = new struct TrieNode(
                                             0, 0, NULL, NULL, NONE);
                                         current->left = child;
                                         num_nodes++;
@@ -133,7 +133,7 @@ std::vector<std::string> Trie::parse_trie_file(std::string file_path) {
                                 current = current->left;
                         } else {
                                 if (current->right == NULL) {
-                                        struct Node *child = new struct Node(
+                                        struct TrieNode *child = new struct TrieNode(
                                             0, 0, NULL, NULL, NONE);
                                         current->right = child;
                                         num_nodes++;

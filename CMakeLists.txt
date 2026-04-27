@@ -22,12 +22,14 @@ SOURCES
         src/helper.cpp
         src/wordlist.cpp
         src/trie.cpp
+        src/dawg.cpp
         include/board.h
         include/trie.h
         include/bot.h
         include/helper.h
         include/print.h
         include/wordlist.h
+        include/dawg.h
 )
 
 add_executable(scrabble_debug
