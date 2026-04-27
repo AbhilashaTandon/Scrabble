@@ -53,6 +53,7 @@ enable_testing()
 add_executable(
   scrabble_test
   tests/helper_test.cpp
+  tests/dawg_test.cpp
   tests/board_test.cpp
   tests/test_gtest.cpp
   tests/wordlist_test.cpp
