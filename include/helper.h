@@ -113,4 +113,5 @@ position_t get_pos(int x, int y);
 
 uint32_t get_bitmask(std::vector<Tile> tiles);
 
+
 #endif

@@ -22,6 +22,7 @@ SOURCES
         src/helper.cpp
         src/wordlist.cpp
         src/trie.cpp
+        src/dawg_node.cpp
         src/dawg.cpp
         include/board.h
         include/trie.h
@@ -38,7 +39,7 @@ add_executable(scrabble_debug
 )
 
 target_include_directories(scrabble_debug PUBLIC include/)
-target_compile_options(scrabble_debug PUBLIC -Wall -Wextra -Wpedantic -g -O0)
+target_compile_options(scrabble_debug PUBLIC -Wall -Wextra -Wpedantic -g -O0 -ggdb -fno-omit-frame-pointer -gcolumn-info)
 
 add_executable(scrabble
         ${SOURCES}

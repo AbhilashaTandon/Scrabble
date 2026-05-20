@@ -1,13 +1,15 @@
 #include "../include/board.h"
-#include "../include/trie.h"
-#include <iostream>
 #include "../include/dawg.h"
+#include "../include/trie.h"
 #include <cassert>
+#include <iostream>
+#include <vector>
 
 int main() {
         setlocale(LC_ALL, "en_US.UTF-8");
-        
-        Dawg d = Dawg("../wordlists/testing.txt");
+
+        std::vector<std::string> wordlist = {"BAKE", "CAKE"};
+        Dawg d = Dawg(wordlist);
         // assert(d.contains("ABACUS"));
         // assert(d.contains("EMBEDDING"));
         // std::cout << (d.contains("GOONIES"));

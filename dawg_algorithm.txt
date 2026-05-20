@@ -1,0 +1,35 @@
+// Source - https://stackoverflow.com/a/38154096
+// Posted by Kevin
+// Retrieved 2026-04-27, License - CC BY-SA 3.0
+
+Given:
+        startState is the state from which traversal of the DAWG is to start
+        register is a map of representations (hint: hashes) OF graphs which extend
+        from states in the DAWG TO said states
+
+While there is newWord in wordList
+    Get newWord from wordList
+    Determine longestPrefix of newWord, starting from startState, which already exists in DAWG
+    Get longestPrefixEndState, the state which the sequence of transitions defined by longestPrefix leads to
+    Get suffix of newWord, the substring of newWord after longestPrefix
+    if longestPrefixEndState has children
+        replace_or_register(longestPrefixEndState)
+    endIf
+    Create the sequence of transitions and states defined by suffix, starting from longestPrefixEndState
+endWhile
+replace_or_register(startState)
+
+
+function replace_or_register(argState)
+    Get greatestCharEndState of argState, the state which the lexicographically-greatest-char-labelled-transition in the outgoing transition set of argState leads to
+    if greatestCharEndState has children
+        replace_or_register(greatestCharEndState)
+    endIf
+    if there exists state in DAWG that is in the register and is equivalent (has an identical graph extending from it) to greatestCharEndState
+        Redefine the transition that extends from argState to greatestCharEndState, as one that extends from argState to state
+        Delete greatestCharEndState
+    endIf
+    else
+        add greatestCharEndState to the register
+    endElse
+
