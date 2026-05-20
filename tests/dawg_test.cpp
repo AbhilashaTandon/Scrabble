@@ -2,6 +2,31 @@
 #include <gtest/gtest.h>
 
 
+
+
+TEST(DawgTests, DawgNode){
+        DawgNode a = DawgNode(Tile::A);
+        DawgNode b = DawgNode(Tile::B);
+        DawgNode c = DawgNode(Tile::C);
+        a.add_child(&b);
+        EXPECT_TRUE(a.has_child(&b));
+        a.add_child(&c);
+        EXPECT_TRUE(a.has_child(&c));
+        c.add_parent(&b);
+        EXPECT_TRUE(c.has_parent(&b));
+        c.remove_parent(&b);
+        EXPECT_FALSE(c.has_parent(&b));
+        c.add_parent(&a);
+        EXPECT_TRUE(c.has_parent(&a));
+        c.remove_parent(&a);
+        EXPECT_FALSE(c.has_parent(&a));
+        a.remove_child(&c);
+        EXPECT_FALSE(a.has_child(&c));
+        a.remove_child(&b);
+        EXPECT_FALSE(a.has_child(&b));
+}
+
+
 TEST(DawgTests, CreateDawg){
         Dawg d = Dawg("../wordlists/NWL2023-modified.txt");
 }

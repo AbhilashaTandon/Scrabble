@@ -8,7 +8,11 @@
 #include <vector>
 
 void remove_from_vector(std::vector<DawgNode *> *vec, DawgNode *item) {
-        vec->erase(std::remove(vec->begin(), vec->end(), item), vec->end());
+        std::vector<DawgNode *>::iterator pos =
+            std::find(vec->begin(), vec->end(), item);
+        if (pos !=
+            vec->end()) // == myVector.end() means the element was not found
+                vec->erase(pos);
 }
 
 DawgNode::DawgNode(Tile t) {
@@ -40,8 +44,8 @@ void DawgNode::add_parent(DawgNode *parent) {
 }
 
 void DawgNode::remove_child(DawgNode *child) {
-        return;
         if (!children_set.contains(child)) {
+                return;
         }
         children_set.erase(child);
         remove_from_vector(&children, child);

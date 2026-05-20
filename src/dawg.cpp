@@ -1,4 +1,3 @@
-
 #include "../include/dawg.h"
 #include <cassert>
 #include <cctype>
@@ -15,11 +14,11 @@ Dawg::Dawg(std::string file_path) : start(Tile::START), end(Tile::END) {
         // read in file
 
         std::string line;
+        std::string word = "";
 
         std::set<DawgNode *> *reg = new std::set<DawgNode *>();
         while (std::getline(file, line)) {
                 std::cout << line << '\n';
-                std::string word = "";
                 std::istringstream stream(line);
                 if (!(stream >> word)) {
                         std::cerr << line << '\n';
@@ -27,21 +26,29 @@ Dawg::Dawg(std::string file_path) : start(Tile::START), end(Tile::END) {
                 }
 
                 add_word(word, reg);
-                print(&start, "start", false, false);
-                std::cout << '\n';
-                print(&end, "end", false, true);
-                std::cout << "--------------------------------" << '\n';
+                assert(this->start.children.back() != 0);
+                assert(this->end.parents.back() != 0);
         }
+
+        assert(this->start.children.back() != 0);
+        assert(this->end.parents.back() != 0);
+
+        print(&start, "start", false, false);
+        std::cout << '\n';
+        print(&end, "end", false, true);
+        std::cout << "--------------------------------" << '\n';
+
         replace_or_register(&this->start, reg);
 }
+
 Dawg::Dawg(std::vector<std::string> wordlist)
     : start(Tile::START), end(Tile::END) {
 
         std::set<DawgNode *> *reg = new std::set<DawgNode *>();
         for (auto word : wordlist) {
-
                 add_word(word, reg);
         }
+
         replace_or_register(&this->start, reg);
         print(&start, "start", false, false);
         print(&end, "end", false, true);
@@ -53,19 +60,23 @@ std::pair<size_t, DawgNode *> Dawg::common_substring(std::string word) {
         DawgNode *current = &this->start;
         size_t idx = 0;
 
-        for (; idx < word.size(); idx++) {
+        std::cout << "substr :";
+
+        for (; idx <= word.size(); idx++) {
                 assert(isupper(word[idx]));
                 Tile t = Tile(word[idx] - 64);
                 DawgNode *next = NULL;
                 for (DawgNode *child : current->children) {
                         // find if node has a child with next letter
-                        if (idx == word.size() - 1 && child->t == END) {
-                                // reached end of word
-                                return std::make_pair(idx, current);
-                        }
+                        // if (idx == word.size() - 1 && child->t == END) {
+                        //         // reached end of word
+                        //         std::cout << "$\n";
+                        //         return std::make_pair(idx, current);
+                        // }
                         if (child->t == t) {
                                 // if next letter is a descendant, go to that
                                 // node
+                                std::cout << char(t + 64);
                                 next = child;
                                 break;
                         }
@@ -76,6 +87,9 @@ std::pair<size_t, DawgNode *> Dawg::common_substring(std::string word) {
                 }
                 current = next;
         }
+
+
+        std::cout << "\n";
 
         return std::make_pair(idx, current);
 }
@@ -89,7 +103,7 @@ std::pair<size_t, DawgNode *> Dawg::common_substring(std::string word) {
 void Dawg::add_word(std::string word, std::set<DawgNode *> *reg) {
 
         // find common substring prefix
-        
+
         auto [idx, current] = common_substring(word);
 
         if (idx == word.size() - 1) {
@@ -119,7 +133,9 @@ void Dawg::add_word(std::string word, std::set<DawgNode *> *reg) {
 }
 
 void Dawg::replace_or_register(DawgNode *state, std::set<DawgNode *> *reg) {
-        std::vector<DawgNode *> *children = &state->children;
+        std::vector<DawgNode *> *children = &(state->children);
+        assert(&this->start.children != NULL);
+        assert(&(state->children) != NULL);
         DawgNode *last_child = children->back();
 
         std::cout << last_child->t;
@@ -193,6 +209,7 @@ void Dawg::print(DawgNode *current, std::string indent, bool is_last,
                 std::cout << "├─";
                 indent += "| ";
         }
+
         std::cout << char(current->t + 64) << '\n';
 
         if (backwards) {
