@@ -1,4 +1,5 @@
 #include "../include/dawg.h"
+#include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <cstdlib>
@@ -28,8 +29,10 @@ Dawg::Dawg(std::string file_path) : start(Tile::START), end(Tile::END) {
 
                 add_word(word, reg);
         }
+        compress(&this->end);
 
         print(&this->start, "", false, false);
+        print(&this->end, "", false, true);
 }
 
 Dawg::Dawg(std::vector<std::string> wordlist)
@@ -38,8 +41,11 @@ Dawg::Dawg(std::vector<std::string> wordlist)
         std::set<DawgNode *> *reg = new std::set<DawgNode *>();
         for (auto word : wordlist) {
                 add_word(word, reg);
-                print(&this->start, "", false, false);
         }
+        compress(&this->end);
+
+        print(&this->start, "", false, false);
+        print(&this->end, "", false, true);
 }
 
 std::pair<size_t, DawgNode *> Dawg::common_prefix(std::string word) {
@@ -110,19 +116,24 @@ void Dawg::add_word(std::string word, std::set<DawgNode *> *reg) {
         this->end.add_parent(node);
 }
 
-void Dawg::replace_or_register(DawgNode *state, std::set<DawgNode *> *reg) {}
-
 bool Dawg::contains(std::string word) {
+
+        for(char c : word){
+                if(!isupper(c)){
+                        return false;
+                }
+        }
 
         auto [idx, node] = common_prefix(word);
 
-        // std::cout << "\nfjdkfjkdjkd" << word << " " << word[idx] << " " << char(node->t + 64) << '\n';
-        
+        // std::cout << "\nfjdkfjkdjkd" << word << " " << word[idx] << " " <<
+        // char(node->t + 64) << '\n';
+
         return (idx >= word.size() && node->t == Tile::END);
 }
 
 void Dawg::print(DawgNode *current, std::string indent, bool is_last,
-                 bool backwards) {
+                 bool backwards) const {
         std::cout << indent;
         if (is_last) {
                 std::cout << "└─";
@@ -147,4 +158,28 @@ void Dawg::print(DawgNode *current, std::string indent, bool is_last,
         }
 }
 
-bool Dawg::is_terminal(DawgNode *node) const {}
+//converts tree into dawg by merging identical parents of nodes
+void Dawg::compress(DawgNode *cusp) {
+        //find all nodes with duplicated tiles and merge them together, after merging one recurse and merge its parents
+
+        if(cusp->parents.size() < 2){
+                return;
+        }
+
+        std::sort(cusp->parents.begin(), cusp->parents.end());
+
+        bool dupl_found = false;
+        DawgNode* base_copy = cusp->parents[0];
+        
+        for(DawgNode * node : cusp->parents){
+                if(node->t == base_copy->t && node != base_copy){
+                        dupl_found = true;
+                        node->replace(base_copy);
+                }
+                else{
+                        dupl_found = false;
+                        compress(base_copy);
+                        base_copy = node;
+                }
+        }
+}

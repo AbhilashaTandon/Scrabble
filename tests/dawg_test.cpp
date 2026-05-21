@@ -24,10 +24,12 @@ TEST(DawgTests, DawgNode) {
 }
 
 TEST(DawgTests, DawgInsertion) {
-        std::vector<std::string> wordlist = {"BAKE", "BALE", "CAKE", "DALE", "DAVE", "BANE", "BA", "AKE", "BAKED", "ABAKE", ""};
+        std::vector<std::string> wordlist = {"BAKE",  "BALE",  "CAKE", "DALE",
+                                             "DAVE",  "BANE",  "BA",   "AKE",
+                                             "BAKED", "ABAKE", ""};
 
         Dawg d = Dawg(wordlist);
-        for(std::string word : wordlist){
+        for (std::string word : wordlist) {
                 // std::cout << word << '\n';
                 EXPECT_TRUE(d.contains(word));
         }
@@ -36,26 +38,31 @@ TEST(DawgTests, DawgInsertion) {
         EXPECT_FALSE(d.contains("AB"));
         EXPECT_FALSE(d.contains("ABAKED"));
         EXPECT_FALSE(d.contains("BAKER"));
+        EXPECT_FALSE(d.contains("BALED"));
+        EXPECT_FALSE(d.contains("BAVE"));
+        EXPECT_FALSE(d.contains("DAKED"));
+        EXPECT_FALSE(d.contains("DANED"));
+        EXPECT_FALSE(d.contains("DANE"));
+        EXPECT_FALSE(d.contains("DA"));
         EXPECT_TRUE(d.contains("BAKE"));
 }
 
-// TEST(DawgTests, CreateDawg){
-//         Dawg d = Dawg("../wordlists/NWL2023-modified.txt");
-// }
-//
-//
-// TEST(DawgTests, CommonSubstring){
-//         Dawg d = Dawg("../wordlists/NWL2023-modified.txt");
-//         EXPECT_TRUE(d.common_prefix("ABACUS").first != 0);
-//         EXPECT_TRUE(d.common_prefix("A").first != 0);
-// }
-//
-// TEST(DawgTests, FindWord){
-//         Dawg d = Dawg("../wordlists/testing.txt");
-//         EXPECT_TRUE(d.contains("BIKE"));
-//         EXPECT_TRUE(d.contains("CAD"));
-//         EXPECT_TRUE(d.contains("LAKE"));
-//         EXPECT_FALSE(d.contains("XXXXXX"));
-//         EXPECT_FALSE(d.contains("abacus"));
-//         EXPECT_FALSE(d.contains(""));
-// }
+TEST(DawgTests, CreateDawg) {
+        Dawg d = Dawg("../wordlists/NWL2023-modified.txt");
+}
+
+TEST(DawgTests, CommonSubstring) {
+        Dawg d = Dawg("../wordlists/NWL2023-modified.txt");
+        EXPECT_TRUE(d.common_prefix("ABACUS").first != 0);
+        EXPECT_TRUE(d.common_prefix("A").first != 0);
+}
+
+TEST(DawgTests, FindWord) {
+        Dawg d = Dawg("../wordlists/testing.txt");
+        EXPECT_TRUE(d.contains("BIKE"));
+        EXPECT_TRUE(d.contains("CAD"));
+        EXPECT_TRUE(d.contains("LAKE"));
+        EXPECT_FALSE(d.contains("XXXXXX"));
+        EXPECT_FALSE(d.contains("abacus"));
+        EXPECT_FALSE(d.contains(""));
+}

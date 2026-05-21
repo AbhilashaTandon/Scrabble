@@ -66,3 +66,20 @@ bool DawgNode::has_child(DawgNode *child) {
 bool DawgNode::has_parent(DawgNode *parent) {
         return parents_set.contains(parent);
 }
+
+
+void DawgNode::replace(DawgNode *sub){
+        for(DawgNode *parent : this->parents){
+                parent->remove_child(this);
+                parent->add_child(sub);
+                this->remove_parent(parent);
+                sub->add_parent(parent);
+        }
+
+        for(DawgNode *child : this->children){
+                child->remove_parent(this);
+                child->add_parent(sub);
+                this->remove_child(child);
+                sub->add_child(child);
+        }
+}

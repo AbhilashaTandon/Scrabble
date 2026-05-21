@@ -17,6 +17,9 @@ class DawgNode {
         void remove_parent(DawgNode *parent);
         bool has_child(DawgNode *child);
         bool has_parent(DawgNode *parent);
+        bool operator<(const DawgNode &str) const { return (t < str.t); }
+        bool operator>(const DawgNode &str) const { return (t > str.t); }
+        void replace(DawgNode *sub);
 
       private:
         std::vector<DawgNode *> parents;
@@ -33,15 +36,15 @@ class Dawg {
         Dawg(std::string wordlist_file_path);
         Dawg(std::vector<std::string> wordlist);
         bool contains(std::string word);
-        void print(DawgNode *current, std::string indent, bool is_last, bool backwards);
+        void print(DawgNode *current, std::string indent, bool is_last,
+                   bool backwards) const;
         std::pair<size_t, DawgNode *> common_prefix(std::string word);
 
       private:
         DawgNode start;
         DawgNode end;
         void add_word(std::string word, std::set<DawgNode *> *reg);
-        void replace_or_register(DawgNode *state, std::set<DawgNode *> *reg);
-        bool is_terminal(DawgNode *node) const;
+        void compress(DawgNode *cusp);
 };
 
 #endif

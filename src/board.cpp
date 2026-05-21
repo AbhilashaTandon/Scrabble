@@ -237,6 +237,7 @@ bool Board::make_play(std::array<tile_place_t, 7> play) {
                 if (contains(new_word->word)) {
                         continue;
                 }
+                std::cerr << "Invalid word " << new_word->word << '\n';
                 for (int j = 0; j < 7; j++) { // remove tiles if invalid word
                         if (play[j].first == NONE) {
                                 continue;
