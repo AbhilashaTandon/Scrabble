@@ -34,7 +34,7 @@ class Dawg {
         Dawg(std::vector<std::string> wordlist);
         bool contains(std::string word);
         void print(DawgNode *current, std::string indent, bool is_last, bool backwards);
-        std::pair<size_t, DawgNode *> common_substring(std::string word);
+        std::pair<size_t, DawgNode *> common_prefix(std::string word);
 
       private:
         DawgNode start;
