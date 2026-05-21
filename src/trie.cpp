@@ -1,5 +1,5 @@
 #include "../include/trie.h"
-#include <benchmark/benchmark.h>
+// #include <benchmark/benchmark.h>
 #include <cassert>
 #include <cctype>
 #include <fstream>

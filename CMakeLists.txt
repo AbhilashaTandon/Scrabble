@@ -22,15 +22,12 @@ SOURCES
         src/helper.cpp
         src/wordlist.cpp
         src/trie.cpp
-        src/dawg_node.cpp
-        src/dawg.cpp
         include/board.h
         include/trie.h
         include/bot.h
         include/helper.h
         include/print.h
         include/wordlist.h
-        include/dawg.h
 )
 
 add_executable(scrabble_debug
@@ -54,7 +51,6 @@ enable_testing()
 add_executable(
   scrabble_test
   tests/helper_test.cpp
-  tests/dawg_test.cpp
   tests/board_test.cpp
   tests/test_gtest.cpp
   tests/wordlist_test.cpp
