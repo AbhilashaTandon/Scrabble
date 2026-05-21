@@ -28,3 +28,7 @@ uint32_t get_bitmask(std::vector<Tile> tiles){
         }
         return bitmask;
 }
+
+bool is_letter_bonus(Square sq){
+    return sq == DOUBLE_LETTER || sq == TRIPLE_LETTER;
+}

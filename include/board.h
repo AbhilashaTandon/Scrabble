@@ -1,38 +1,61 @@
 #ifndef BOARD_H
 #define BOARD_H
+#include "extensions.h"
 #include "helper.h"
 #include "wordlist.h"
 #include <array>
 #include <cstdint>
 #include <vector>
 
-struct Word{
+struct Word {
         std::string word;
         position_t start;
         bool is_vertical;
+
+        Word(std::string w, position_t s, bool v)
+            : word(w), start(s), is_vertical(v) {}
+        bool operator<(const Word &other_word) const {
+                return (word < other_word.word);
+        }
+        bool operator==(const Word &other_word) const {
+                return (word == other_word.word) &&
+                       (start == other_word.start) &&
+                       (is_vertical == other_word.is_vertical);
+        }
 };
 
 class Board {
       public:
-        Board(std::string wordlist_file_path, std::string trie_file_path);
-        bool make_play(std::array<tile_place_t, 7>);
+        Board(std::string wordlist_file_path, std::string trie_file_path,
+              std::string ext_file_path);
+        std::set<struct Word> make_play(std::array<tile_place_t, 7>);
         void print() const;
         bool contains(std::string word) const;
 
       private:
+        uint16_t score_a;
+        uint16_t score_b;
         std::vector<Tile> bag;
         Tile board[225];
         std::array<Tile, 7> rack_a;
         std::array<Tile, 7> rack_b;
         std::uint16_t move_count;
         WordList wordlist;
+        std::set<struct Word> get_formed_words(
+            std::array<tile_place_t, 7> play); // gets new words formed by move
+
+        extension_map extensions;
 
         std::vector<Tile> draw_tiles(tilecount_t num_tiles);
-        // bool check_valid_words(position_t p); // checks if horizontal and vertical words at p are valid
-        std::vector<struct Word*> get_formed_words(std::array<tile_place_t, 7> play); //gets new words formed by move at p
 
-        
-        // a and b are labels we will use to refer to the 2 players
-        //
+        std::vector<uint32_t> horiz_move_letter_opts;
+        std::vector<uint32_t> vert_move_letter_opts;
+        // we can use extensions of words to find the letters that can be played
+        // in each square
+
+        std::array<bool, 225> bonus_used;
+        // we mark this as true whenever a move uses a bonus square
+
+        uint16_t add_score(struct Word w);
 };
 #endif

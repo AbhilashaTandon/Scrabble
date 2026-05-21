@@ -54,6 +54,8 @@ enum Tile {
 };
 enum Square { EMPTY, DOUBLE_LETTER, TRIPLE_LETTER, DOUBLE_WORD, TRIPLE_WORD };
 
+bool is_letter_bonus(Square sq);
+
 typedef std::pair<Tile, position_t> tile_place_t;
 
 score_t get_score(std::string word);
@@ -112,6 +114,8 @@ coords_t get_xy(position_t pos);
 position_t get_pos(int x, int y);
 
 uint32_t get_bitmask(std::vector<Tile> tiles);
+
+const position_t PASS = 225;
 
 
 #endif

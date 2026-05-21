@@ -15,10 +15,11 @@
 #define min(x, y) ((x) < (y)) ? (x) : (y)
 #define max(x, y) ((x) > (y)) ? (x) : (y)
 
-Board::Board(std::string wordlist_file_path, std::string trie_file_path)
+Board::Board(std::string wordlist_file_path, std::string trie_file_path,
+             std::string ext_file_path)
     : wordlist(wordlist_file_path, trie_file_path) {
 
-        for (int i = 0; i < 28; i++) {
+        for (int i = 0; i < 30; i++) {
                 tilecount_t count = tile_freq[i];
                 for (tilecount_t j = 0; j < count; j++) {
                         bag.push_back((Tile)i);
@@ -38,15 +39,22 @@ Board::Board(std::string wordlist_file_path, std::string trie_file_path)
                 rack_a[i] = draw_a[i];
                 rack_b[i] = draw_b[i];
         }
+
+        extensions = read_file(ext_file_path);
+
+        score_a = 0;
+        score_b = 0;
+        bonus_used = std::array<bool, 225>();
+        move_count = 0;
 }
 
 bool Board::contains(std::string word) const { return wordlist.contains(word); }
 
-std::vector<struct Word *>
+std::set<struct Word>
 Board::get_formed_words(std::array<tile_place_t, 7> play) {
 
         // add horizontal word
-        std::vector<struct Word *> formed_words = std::vector<struct Word *>();
+        std::set<struct Word> formed_words = std::set<struct Word>();
         for (tile_place_t tile : play) {
                 position_t p = tile.second;
                 coords_t coords = get_xy(p);
@@ -54,11 +62,16 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
                 int x_coord = coords.first;
                 int y_coord = coords.second;
 
+                if(tile.first == Tile::NONE){
+                        continue;
+                }
                 {
                         std::deque<char> horiz;
 
                         int x_word_start =
                             x_coord; // find first char of horizontal word
+                        assert(board[get_pos(x_word_start, y_coord)] !=
+                               Tile::NONE);
                         while (x_word_start >= 0 &&
                                board[get_pos(x_word_start, y_coord)] != NONE) {
                                 char add_to_front =
@@ -99,10 +112,10 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
                                         horiz_str += c;
                                 }
 
-                                struct Word *new_word =
-                                    new Word(horiz_str, x_word_start, false);
+                                struct Word new_word =
+                                    Word(horiz_str, get_pos(x_word_start, y_coord), false);
 
-                                formed_words.push_back(new_word);
+                                formed_words.insert(new_word);
                         }
                 }
 
@@ -112,6 +125,8 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
 
                         int y_word_start =
                             y_coord; // find first char of vertical word
+                        assert(board[get_pos(x_coord, y_word_start)] !=
+                               Tile::NONE);
                         while (y_word_start >= 0 &&
                                board[get_pos(x_coord, y_word_start)] != NONE) {
                                 char add_to_front =
@@ -145,19 +160,33 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
                                 for (char c : vert) {
                                         vert_str += c;
                                 }
-                                struct Word *new_word =
-                                    new Word(vert_str, y_word_start, true);
+                                struct Word new_word =
+                                    Word(vert_str, get_pos(x_coord, y_word_start), true);
 
-                                formed_words.push_back(new_word);
+                                formed_words.insert(new_word);
                         }
                 }
         }
         return formed_words;
 }
 
-bool Board::make_play(std::array<tile_place_t, 7> play) {
+std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
         // to be a valid scrabble move all letters must be in either one row or
         // column, and all words formed by these new letters must be valid
+
+        bool is_pass = true;
+        for (auto tile : play) {
+                if (tile.first != NONE) {
+                        is_pass = false;
+                }
+        }
+
+        if (is_pass && move_count == 0) {
+                return std::set<struct Word>();
+                // can't pass on first move of game
+        } else if (is_pass && move_count > 0) {
+                return {Word("", PASS, false)};
+        }
 
         int min_x = 15;
         int max_x = -1;
@@ -173,7 +202,7 @@ bool Board::make_play(std::array<tile_place_t, 7> play) {
                         std::cerr << "Error: cannot place tile, tile is "
                                      "already present."
                                   << '\n';
-                        return false;
+                        return std::set<struct Word>();
                 }
                 coords_t coords = get_xy(p);
                 min_x = min(min_x, coords.first);
@@ -186,7 +215,7 @@ bool Board::make_play(std::array<tile_place_t, 7> play) {
                         }
                         if (p == play[j].second) {
                                 std::cerr << "Overlapping tiles" << '\n';
-                                return false;
+                                return std::set<struct Word>();
                         }
                 }
         }
@@ -197,7 +226,7 @@ bool Board::make_play(std::array<tile_place_t, 7> play) {
 
         if (!vertical && (min_y != max_y)) {
                 std::cerr << "Tiles not in one row or column" << '\n';
-                return false;
+                        return std::set<struct Word>();
         }
 
         for (int i = 0; i < 7; i++) { // add in tiles
@@ -216,7 +245,7 @@ bool Board::make_play(std::array<tile_place_t, 7> play) {
                         if (board[get_pos(min_x, y)] == NONE) {
                                 std::cerr << "Gap in main vertical word at "
                                           << min_x << " " << y << " " << '\n';
-                                return false;
+                        return std::set<struct Word>();
                                 // if gap in main word played
                         }
                 }
@@ -227,17 +256,19 @@ bool Board::make_play(std::array<tile_place_t, 7> play) {
                         if (board[get_pos(x, min_y)] == NONE) {
                                 std::cerr << "Gap in main horizontal word at "
                                           << x << " " << min_y << " " << '\n';
-                                return false;
+                        return std::set<struct Word>();
                                 // if gap in main word played
                         }
                 }
         }
 
-        for (struct Word *new_word : get_formed_words(play)) {
-                if (contains(new_word->word)) {
+        std::set<struct Word> new_words = get_formed_words(play);
+
+        for (struct Word new_word : new_words) {
+                if (contains(new_word.word)) {
                         continue;
                 }
-                std::cerr << "Invalid word " << new_word->word << '\n';
+                std::cerr << "Invalid word " << new_word.word << '\n';
                 for (int j = 0; j < 7; j++) { // remove tiles if invalid word
                         if (play[j].first == NONE) {
                                 continue;
@@ -245,10 +276,11 @@ bool Board::make_play(std::array<tile_place_t, 7> play) {
                         position_t p = play[j].second;
                         board[p] = Tile::NONE;
                 }
-                return false;
+                        return std::set<struct Word>();
         }
 
-        return true;
+        move_count++;
+        return new_words;
 }
 
 std::vector<Tile> Board::draw_tiles(tilecount_t num_tiles) {
@@ -330,4 +362,58 @@ void Board::print() const {
         }
 
         std::cout << "\n\n";
+}
+
+uint16_t Board::add_score(struct Word w) {
+        uint16_t score = 0;
+        uint16_t multiplier = 1;
+
+        coords_t coords = get_xy(w.start);
+        position_t pos = w.start;
+
+        for (int i = 0; i < 7; i++) {
+
+                Square bonus = board_layout[pos];
+                bool square_used = bonus_used[pos];
+
+                assert(!(square_used && bonus == EMPTY));
+
+                score += tile_scores[Tile(w.word[i] - 64)];
+                // we always add score of letter
+
+                if (!square_used) {
+                        // if bonus is still fresh
+                        switch (bonus) {
+                        case DOUBLE_LETTER:
+                                score += tile_scores[Tile(w.word[i] - 64)];
+                                // add score once more to double
+                                break;
+
+                        case TRIPLE_LETTER:
+                                score += tile_scores[Tile(w.word[i] - 64)] * 2;
+                                // add twice more to triple
+                                break;
+
+                        // multipliers stack
+                        case DOUBLE_WORD:
+                                multiplier *= 2;
+                                break;
+                        case TRIPLE_WORD:
+                                multiplier *= 3;
+                                break;
+
+                        default:
+                                break;
+                        }
+
+                        bonus_used[pos] = true;
+                        // mark the bonus as used since we used it
+                }
+
+                position_t pos = get_pos(coords.first + int(!w.is_vertical),
+                                         coords.second + int(w.is_vertical));
+                // wow this line is a mess
+        }
+
+        return score;
 }

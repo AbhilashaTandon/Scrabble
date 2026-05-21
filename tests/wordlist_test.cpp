@@ -14,7 +14,7 @@ TEST(WordlistTests, WordTests) {
 }
 
 TEST(WordlistTests, BoardTests) {
-        Board b = Board("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt");
+        Board b = Board("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt", "../wordlists/extensions.txt");
         ASSERT_TRUE(b.contains("AA"));
         ASSERT_TRUE(b.contains("AB"));
         ASSERT_TRUE(b.contains("CAKE"));
