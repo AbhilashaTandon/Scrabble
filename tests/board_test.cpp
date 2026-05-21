@@ -13,7 +13,7 @@ TEST(BoardTests, HorizontalWord) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board("../wordlists/NWL2023-modified.txt");
+        Board b = Board("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt");
         EXPECT_TRUE(b.make_play(play));
 }
 
@@ -27,13 +27,13 @@ TEST(BoardTests, Gap) {
         play[5] = std::make_pair(Tile::A, get_pos(8, 7));
         play[6] = std::make_pair(Tile::N, get_pos(9, 7));
 
-        Board b = Board("../wordlists/NWL2023-modified.txt");
+        Board b = Board("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt");
         EXPECT_FALSE(b.make_play(play));
 }
 
 
 TEST(BoardTests, Overlap){
-        Board b = Board("../wordlists/NWL2023-modified.txt");
+        Board b = Board("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt");
         std::array<tile_place_t, 7> play;
 
         play[0] = std::make_pair(Tile::A, get_pos(14, 4));
@@ -48,7 +48,7 @@ TEST(BoardTests, Overlap){
 }
 
 TEST(BoardTests, Vertical){
-        Board b = Board("../wordlists/NWL2023-modified.txt");
+        Board b = Board("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt");
         std::array<tile_place_t, 7> play;
 
         play[0] = std::make_pair(Tile::A, get_pos(14, 4));
@@ -63,7 +63,7 @@ TEST(BoardTests, Vertical){
 }
 
 TEST(BoardTests, Separated){
-        Board b = Board("../wordlists/NWL2023-modified.txt");
+        Board b = Board("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt");
         std::array<tile_place_t, 7> play;
 
         play[0] = std::make_pair(Tile::A, get_pos(0, 0));
@@ -87,7 +87,7 @@ TEST(BoardTests, CrissCross) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board("../wordlists/NWL2023-modified.txt");
+        Board b = Board("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt");
         EXPECT_TRUE(b.make_play(play));
         
         play[0] = std::make_pair(Tile::B, get_pos(3, 8));
@@ -113,7 +113,7 @@ TEST(BoardTests, AddOneTile){
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board("../wordlists/NWL2023-modified.txt");
+        Board b = Board("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt");
         EXPECT_TRUE(b.make_play(play));
 
         play[0] = std::make_pair(Tile::T, get_pos(3, 8));

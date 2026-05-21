@@ -4,8 +4,8 @@
 #include <sstream>
 #include <string>
 
-WordList::WordList(std::string file_path) {
-        std::fstream file = std::fstream(file_path.c_str(), std::ios_base::in);
+WordList::WordList(std::string wordlist_file_path, std::string trie_file_path) : trie(trie_file_path) {
+        std::fstream file = std::fstream(wordlist_file_path.c_str(), std::ios_base::in);
         std::string line;
         while (std::getline(file, line)) {
                 std::istringstream stream(line);

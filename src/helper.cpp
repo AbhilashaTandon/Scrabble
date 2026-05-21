@@ -19,3 +19,12 @@ coords_t get_xy(position_t pos) {
 position_t get_pos(int x, int y){
         return position_t(x + y * 15);
 }
+
+
+uint32_t get_bitmask(std::vector<Tile> tiles){
+        uint32_t bitmask = 0;
+        for(Tile t : tiles){
+                bitmask |= (1 << int(t));
+        }
+        return bitmask;
+}
