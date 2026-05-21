@@ -19,10 +19,12 @@ FetchContent_Declare(
 set(
 SOURCES
         src/board.cpp
+        src/extensions.cpp
         src/helper.cpp
         src/wordlist.cpp
         src/trie.cpp
         include/board.h
+        include/extensions.h
         include/trie.h
         include/bot.h
         include/helper.h
