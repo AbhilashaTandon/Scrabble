@@ -23,6 +23,7 @@ SOURCES
         src/helper.cpp
         src/wordlist.cpp
         src/trie.cpp
+        src/parse_gcg.cpp
         include/board.h
         include/extensions.h
         include/trie.h
@@ -30,6 +31,7 @@ SOURCES
         include/helper.h
         include/print.h
         include/wordlist.h
+        include/parse_gcg.h
 )
 
 add_executable(scrabble_debug

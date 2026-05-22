@@ -32,3 +32,13 @@ uint32_t get_bitmask(std::vector<Tile> tiles){
 bool is_letter_bonus(Square sq){
     return sq == DOUBLE_LETTER || sq == TRIPLE_LETTER;
 }
+
+Tile make_tile(char c){
+        if (isupper(c)) {
+                return Tile(c - 'A');
+        } else if (islower(c)) {
+                return Tile(c - 'a');
+        } else {
+                return Tile::NONE;
+        }
+}

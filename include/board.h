@@ -29,12 +29,21 @@ class Board {
         Board(std::string wordlist_file_path, std::string trie_file_path,
               std::string ext_file_path);
         std::set<struct Word> make_play(std::array<tile_place_t, 7>);
+        void pass();
+  //these cant be struct Words because its legal to play non-adjacent tiles if there are existing tiles between them that form a word
         void print() const;
         bool contains(std::string word) const;
+        void end_game();
+
+        void bonus_or_penalty(int point_diff);
+
+        int get_score(bool player_a);
+
+        void set_rack(std::string new_rack);
 
       private:
-        uint16_t score_a;
-        uint16_t score_b;
+        int score_a;
+        int score_b;
         std::vector<Tile> bag;
         Tile board[225];
         std::array<Tile, 7> rack_a;

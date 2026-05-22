@@ -1,0 +1,21 @@
+
+
+#ifndef PARSE_GCG_H
+#define PARSE_GCG_H
+#include "board.h"
+#include "helper.h"
+
+class GCGParser {
+public:
+        GCGParser(std::string file_path);
+        bool validate_game();
+        bool parse_move(std::string line);
+
+      private:
+        std::string player1;
+        std::string player2;
+        Board b;
+        std::string file_path;
+};
+
+#endif
