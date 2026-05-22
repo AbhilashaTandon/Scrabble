@@ -60,6 +60,9 @@ bool GCGParser::validate_game() {
                         }
                 }
         }
+
+        b.print();
+
         return true;
 }
 
@@ -200,28 +203,38 @@ bool GCGParser::parse_move(std::string line) {
         stream >> point_difference;
         stream >> updated_score;
 
-        std::cout << (is_player_1 ? player1 : player2) << "\t" << rack <<
-        '\t' << x_start << "," << y_start << " " << word_played << " " <<
-        point_difference << " " << updated_score << '\n'; std::cout << line
-        << '\n';
-        
+        // std::cout << (is_player_1 ? player1 : player2) << "\t" << rack << '\t'
+        //           << x_start << "," << y_start << " " << word_played << " "
+        //           << point_difference << " " << updated_score << '\n';
+        // std::cout << line << '\n';
 
         std::array<tile_place_t, 7> play;
         int x_coord = x_start;
         int y_coord = y_start;
         int letter_idx = 0;
         for (char c : word_played) {
+                char current = b.get_letter(x_coord, y_coord);
+                if (current == c || c == '.') {
+                        if (is_vertical) {
+                                y_coord++;
+                        } else {
+                                x_coord++;
+                        }
+                        continue;
+                }
+                else if(current != '@'){
+                        std::cerr << "Error: cannot place tile " << c << " at position(" << int(x_coord) << "," << int(y_coord) << "), tile " << current << " is already present\n";
+                        return false;
+                }
                 if (isupper(c)) {
-                        play[letter_idx] =
-                            std::make_pair(Tile(c - 'A' + 1), get_pos(x_coord, y_coord));
+                        play[letter_idx] = std::make_pair(
+                            Tile(c - 'A' + 1), get_pos(x_coord, y_coord));
                         letter_idx++;
-                }
-                else if(islower(c)){
-                        play[letter_idx] =
-                            std::make_pair(Tile(c - 'a' + 1), get_pos(x_coord, y_coord));
+                } else if (islower(c)) {
+                        play[letter_idx] = std::make_pair(
+                            Tile(c - 'a' + 1), get_pos(x_coord, y_coord));
                         letter_idx++;
-                }
-                else if (c != '.'){
+                } else if (c != '.') {
                         std::cerr << c << ": not a valid character\n";
                         assert(false);
                 }
@@ -235,9 +248,9 @@ bool GCGParser::parse_move(std::string line) {
 
         bool result = b.make_play(play).size() > 0;
 
-        if(result){
-                b.print();
-        }
+        // if (result) {
+        //         b.print();
+        // }
 
         return result;
 }

@@ -11,8 +11,6 @@ int main() {
                 std::cout << entry.path() << std::endl;
                 GCGParser parser(entry.path());
                 std::cout << parser.validate_game();
-                std::cout << entry.path() << std::endl;
-                return 0;
         }
 
         // std::array<tile_place_t, 7> play;

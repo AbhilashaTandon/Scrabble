@@ -43,6 +43,7 @@ class Board {
 
         char get_letter(uint8_t x, uint8_t y) const;
 
+
       private:
         int score_a;
         int score_b;
