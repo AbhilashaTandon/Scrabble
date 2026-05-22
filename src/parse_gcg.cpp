@@ -200,20 +200,30 @@ bool GCGParser::parse_move(std::string line) {
         stream >> point_difference;
         stream >> updated_score;
 
-        // std::cout << (is_player_1 ? player1 : player2) << "\t" << rack <<
-        // '\t' << x_coord << "," << y_coord << " " << word_played << " " <<
-        // point_difference << " " << updated_score << '\n'; std::cout << line
-        // << '\n';
+        std::cout << (is_player_1 ? player1 : player2) << "\t" << rack <<
+        '\t' << x_start << "," << y_start << " " << word_played << " " <<
+        point_difference << " " << updated_score << '\n'; std::cout << line
+        << '\n';
+        
 
         std::array<tile_place_t, 7> play;
         int x_coord = x_start;
         int y_coord = y_start;
         int letter_idx = 0;
         for (char c : word_played) {
-                if (c != '.') {
+                if (isupper(c)) {
                         play[letter_idx] =
-                            std::make_pair(Tile(c), get_pos(x_coord, y_coord));
+                            std::make_pair(Tile(c - 'A' + 1), get_pos(x_coord, y_coord));
                         letter_idx++;
+                }
+                else if(islower(c)){
+                        play[letter_idx] =
+                            std::make_pair(Tile(c - 'a' + 1), get_pos(x_coord, y_coord));
+                        letter_idx++;
+                }
+                else if (c != '.'){
+                        std::cerr << c << ": not a valid character\n";
+                        assert(false);
                 }
 
                 if (is_vertical) {
@@ -223,5 +233,11 @@ bool GCGParser::parse_move(std::string line) {
                 }
         }
 
-        return b.make_play(play).size() > 0;
+        bool result = b.make_play(play).size() > 0;
+
+        if(result){
+                b.print();
+        }
+
+        return result;
 }
