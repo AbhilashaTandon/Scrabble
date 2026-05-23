@@ -4,6 +4,7 @@
 #include "helper.h"
 #include "wordlist.h"
 #include <array>
+#include <unordered_set>
 #include <cstdint>
 #include <vector>
 
@@ -49,8 +50,8 @@ class Board {
         int score_b;
         std::vector<Tile> bag;
         Tile board[225];
-        std::array<Tile, 7> rack_a;
-        std::array<Tile, 7> rack_b;
+        std::unordered_multiset<Tile> rack_a;
+        std::unordered_multiset<Tile> rack_b;
         std::uint16_t move_count;
         WordList wordlist;
         std::set<struct Word> get_formed_words(
@@ -58,7 +59,7 @@ class Board {
 
         extension_map extensions;
 
-        std::vector<Tile> draw_tiles(tilecount_t num_tiles);
+        std::unordered_multiset<Tile> draw_tiles(tilecount_t num_tiles);
 
         std::vector<uint32_t> horiz_move_letter_opts;
         std::vector<uint32_t> vert_move_letter_opts;

@@ -14,7 +14,7 @@ GCGParser::GCGParser(std::string file_path)
         player2 = "player2";
 }
 
-bool GCGParser::validate_game() {
+bool GCGParser::validate_game(bool verbose) {
 
         std::fstream file = std::fstream(file_path.c_str(), std::ios_base::in);
         // read in file
@@ -55,18 +55,23 @@ bool GCGParser::validate_game() {
 
                 if (first_word[0] == '>') {
                         // parse actual moves now
-                        if (!parse_move(line)) {
+                        if (!parse_move(line, verbose)) {
+                                if (verbose) {
+                                        b.print();
+                                }
                                 return false;
                         }
                 }
         }
 
-        b.print();
+        if (verbose) {
+                b.print();
+        }
 
         return true;
 }
 
-bool GCGParser::parse_move(std::string line) {
+bool GCGParser::parse_move(std::string line, bool verbose) {
         std::istringstream stream(line);
 
         bool is_player_1 = false;
@@ -193,8 +198,6 @@ bool GCGParser::parse_move(std::string line) {
                 return false;
         }
 
-        // std::cout << position << "\n";
-
         y_start = std::stoi(y_coord_str) - 1;
         // TODO:: check for error here because this will panic if y_coord_str is
         // not a number
@@ -203,10 +206,13 @@ bool GCGParser::parse_move(std::string line) {
         stream >> point_difference;
         stream >> updated_score;
 
-        // std::cout << (is_player_1 ? player1 : player2) << "\t" << rack << '\t'
-        //           << x_start << "," << y_start << " " << word_played << " "
-        //           << point_difference << " " << updated_score << '\n';
-        // std::cout << line << '\n';
+        if (verbose) {
+                std::cout << (is_player_1 ? player1 : player2) << "\t" << rack
+                          << '\t' << x_start << "," << y_start << " "
+                          << word_played << " " << point_difference << " "
+                          << updated_score << '\n';
+                std::cout << line << '\n';
+        }
 
         std::array<tile_place_t, 7> play;
         int x_coord = x_start;
@@ -214,16 +220,19 @@ bool GCGParser::parse_move(std::string line) {
         int letter_idx = 0;
         for (char c : word_played) {
                 char current = b.get_letter(x_coord, y_coord);
-                if (current == c || c == '.') {
+                if (current == c || c == '.' ||
+                    (islower(c) && (current + 32 == c))) {
                         if (is_vertical) {
                                 y_coord++;
                         } else {
                                 x_coord++;
                         }
                         continue;
-                }
-                else if(current != '@'){
-                        std::cerr << "Error: cannot place tile " << c << " at position(" << int(x_coord) << "," << int(y_coord) << "), tile " << current << " is already present\n";
+                } else if (current != '@') {
+                        std::cerr << "Error: cannot place tile " << c
+                                  << " at position(" << int(x_coord) << ","
+                                  << int(y_coord) << "), tile " << current
+                                  << " is already present\n";
                         return false;
                 }
                 if (isupper(c)) {
@@ -248,9 +257,10 @@ bool GCGParser::parse_move(std::string line) {
 
         bool result = b.make_play(play).size() > 0;
 
-        // if (result) {
-        //         b.print();
-        // }
+        if (!result && verbose) {
+                b.print();
+                std::cout << line << '\n';
+        }
 
         return result;
 }

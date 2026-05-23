@@ -12,6 +12,7 @@
 #include <iostream>
 #include <locale>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #define min(x, y) ((x) < (y)) ? (x) : (y)
@@ -30,23 +31,18 @@ Board::Board(std::string wordlist_file_path, std::string trie_file_path,
 
         for (int i = 0; i < 225; i++) {
                 board[i] = NONE;
+                bonus_used[i] = false;
         }
 
         std::srand(std::time(0));
 
-        std::vector<Tile> draw_a = draw_tiles(7);
-        std::vector<Tile> draw_b = draw_tiles(7);
-
-        for (int i = 0; i < 7; i++) {
-                rack_a[i] = draw_a[i];
-                rack_b[i] = draw_b[i];
-        }
+        rack_a = draw_tiles(7);
+        rack_b = draw_tiles(7);
 
         extensions = read_file(ext_file_path);
 
         score_a = 0;
         score_b = 0;
-        bonus_used = std::array<bool, 225>();
         move_count = 0;
 }
 
@@ -195,8 +191,8 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
         }
 
         if (is_pass && move_count == 0) {
+                std::cerr << "Error: cannot pass on first move of game.\n";
                 return std::set<struct Word>();
-                // can't pass on first move of game
         } else if (is_pass && move_count > 0) {
                 pass();
                 return {Word("", PASS, false)};
@@ -216,9 +212,10 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
                         coords_t coords = get_xy(p);
                         print();
                         std::cerr << "Error: cannot place tile "
-                                  << char(play[i].first + '@') << " at position ("
-                                  << int(coords.first) << "," << int(coords.second)
-                                  << "), tile " << char(board[p] + '@')
+                                  << char(play[i].first + '@')
+                                  << " at position (" << int(coords.first)
+                                  << "," << int(coords.second) << "), tile "
+                                  << char(board[p] + '@')
                                   << " is already present.\n";
                         return std::set<struct Word>();
                 }
@@ -298,19 +295,66 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
                 return std::set<struct Word>();
         }
 
-        // TODO: add check that tiles played are the same as on rack, and
-        // replace tiles on rack with random ones from bag.
+        std::unordered_multiset<Tile> rack_letters =
+            std::unordered_multiset<Tile>();
+
+        std::unordered_multiset<Tile> current_players_rack =
+            move_count % 2 == 0 ? rack_a : rack_b;
+
+        for (Tile t : current_players_rack) {
+                rack_letters.insert(t);
+        }
+
+        assert(rack_letters.size() == current_players_rack.size());
+
+        for (int i = 0; i < 7; i++) {
+                if (play[i].first == NONE) {
+                        continue;
+                }
+                if (rack_letters.contains(play[i].first)) {
+                        const auto it = rack_letters.find(play[i].first);
+                        assert(it != rack_letters.end());
+                        rack_letters.erase(it);
+                } else {
+
+                        const auto it = rack_letters.find(Tile::BLANK);
+                        if (it != rack_letters.end()) {
+                                rack_letters.erase(it);
+                                continue;
+                        }
+                        std::cerr << "Play contains tiles ("
+                                  << char(play[i].first + '@')
+                                  << ") not found on "
+                                     "player's rack: ";
+                        for (Tile t : current_players_rack) {
+                                std::cerr << char(t + '@');
+                        }
+                        std::cerr << ".\n";
+                        return std::set<struct Word>();
+                }
+        }
+
+        rack_letters.merge(draw_tiles(7 - rack_letters.size()));
+
+        for (struct Word new_word : new_words) {
+                if (move_count % 2 == 0) {
+                        score_a += add_score(new_word);
+                } else {
+                        score_b += add_score(new_word);
+                }
+        }
 
         move_count++;
         return new_words;
 }
 
-std::vector<Tile> Board::draw_tiles(tilecount_t num_tiles) {
-        std::vector<Tile> selection = std::vector<Tile>();
+std::unordered_multiset<Tile> Board::draw_tiles(tilecount_t num_tiles) {
+        std::unordered_multiset<Tile> selection =
+            std::unordered_multiset<Tile>();
         for (tilecount_t i = 0; i < num_tiles; i++) {
                 int index = std::rand() % bag.size();
                 Tile t = bag[index];
-                selection.push_back(t);
+                selection.insert(t);
                 bag.erase(bag.begin() + index);
         }
         return selection;
@@ -326,8 +370,8 @@ void Board::print() const {
         for (int i = 0; i < 17; i++) {
                 std::cout << " ";
         }
-        for (int i = 0; i < 7; i++) {
-                std::cout << converter.to_bytes(rack_tiles[rack_a[i]]);
+        for (Tile t : rack_a) {
+                std::cout << converter.to_bytes(rack_tiles[t]);
                 std::cout << " ";
         }
 
@@ -369,8 +413,8 @@ void Board::print() const {
         for (int i = 0; i < 17; i++) {
                 std::cout << " ";
         }
-        for (int i = 0; i < 7; i++) {
-                std::cout << converter.to_bytes(rack_tiles[rack_b[i]]);
+        for (Tile t : rack_b) {
+                std::cout << converter.to_bytes(rack_tiles[t]);
                 std::cout << " ";
         }
 
@@ -388,28 +432,24 @@ void Board::print() const {
 
 void Board::set_rack(std::string new_rack) {
         if (move_count % 2 == 0) {
+                rack_a = std::unordered_multiset<Tile>();
                 size_t i = 0;
                 for (; i < new_rack.size(); i++) {
                         if (new_rack[i] == '?') {
-                                rack_a[i] = Tile::BLANK;
+                                rack_a.insert(Tile::BLANK);
                                 continue;
                         }
-                        rack_a[i] = Tile(new_rack[i] - '@');
-                }
-                for (; i < 7; i++) {
-                        rack_a[i] = Tile::NONE;
+                        rack_a.insert(Tile(new_rack[i] - '@'));
                 }
         } else {
+                rack_b = std::unordered_multiset<Tile>();
                 size_t i = 0;
                 for (; i < new_rack.size(); i++) {
                         if (new_rack[i] == '?') {
-                                rack_b[i] = Tile::BLANK;
+                                rack_b.insert(Tile::BLANK);
                                 continue;
                         }
-                        rack_b[i] = Tile(new_rack[i] - '@');
-                }
-                for (; i < 7; i++) {
-                        rack_b[i] = Tile::NONE;
+                        rack_b.insert(Tile(new_rack[i] - '@'));
                 }
         }
 }
@@ -437,35 +477,38 @@ uint16_t Board::add_score(struct Word w) {
                         case DOUBLE_LETTER:
                                 score += tile_scores[Tile(w.word[i] - 64)];
                                 // add score once more to double
+                                bonus_used[pos] = true;
                                 break;
 
                         case TRIPLE_LETTER:
                                 score += tile_scores[Tile(w.word[i] - 64)] * 2;
                                 // add twice more to triple
+                                bonus_used[pos] = true;
                                 break;
 
                         // multipliers stack
                         case DOUBLE_WORD:
                                 multiplier *= 2;
+                                bonus_used[pos] = true;
                                 break;
                         case TRIPLE_WORD:
                                 multiplier *= 3;
+                                bonus_used[pos] = true;
                                 break;
 
                         default:
                                 break;
                         }
 
-                        bonus_used[pos] = true;
                         // mark the bonus as used since we used it
                 }
 
-                position_t pos = get_pos(coords.first + int(!w.is_vertical),
-                                         coords.second + int(w.is_vertical));
+                pos = get_pos(coords.first + int(!w.is_vertical),
+                              coords.second + int(w.is_vertical));
                 // wow this line is a mess
         }
 
-        return score;
+        return score * multiplier;
 }
 
 char Board::get_letter(uint8_t x, uint8_t y) const {

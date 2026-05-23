@@ -8,8 +8,8 @@
 class GCGParser {
 public:
         GCGParser(std::string file_path);
-        bool validate_game();
-        bool parse_move(std::string line);
+        bool validate_game(bool verbose);
+        bool parse_move(std::string line, bool verbose);
 
       private:
         std::string player1;

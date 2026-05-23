@@ -1,17 +1,13 @@
+// #include "../include/board.h"
 #include "../include/parse_gcg.h"
-#include "../include/board.h"
 #include <cassert>
-#include <filesystem>
+// #include <filesystem>
 #include <iostream>
 
 int main() {
         setlocale(LC_ALL, "en_US.UTF-8");
-        const std::filesystem::path path = "../games";
-        for (const auto &entry : std::filesystem::directory_iterator(path)) {
-                std::cout << entry.path() << std::endl;
-                GCGParser parser(entry.path());
-                std::cout << parser.validate_game();
-        }
+        GCGParser parser("../games/fivepoint.gcg");
+        std::cout << parser.validate_game(true);
 
         // std::array<tile_place_t, 7> play;
         // play[0] = std::make_pair(Tile::A, get_pos(3, 7));
@@ -23,7 +19,8 @@ int main() {
         // play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
         //
         // Board b = Board("../wordlists/NWL2023-modified.txt",
-        //                 "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        //                 "../wordlists/trie.txt",
+        //                 "../wordlists/extensions.txt");
         //
         // b.make_play(play).size();
         //
@@ -38,7 +35,6 @@ int main() {
         // b.make_play(play);
         //
         // b.print();
-
 
         return 0;
 }
