@@ -1,10 +1,11 @@
 
 #include "../include/wordlist.h"
 #include "../include/board.h"
-#include <gtest/gtest.h>
+#include "../include/test.h"
+#include "gtest/gtest.h"
 
 TEST(WordlistTests, WordTests) {
-        WordList w = WordList("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt");
+        WordList w = WordList(wordlist_file, trie_file);
         ASSERT_TRUE(w.contains("AA"));
         ASSERT_TRUE(w.contains("AB"));
         ASSERT_TRUE(w.contains("CAKE"));
@@ -14,7 +15,7 @@ TEST(WordlistTests, WordTests) {
 }
 
 TEST(WordlistTests, BoardTests) {
-        Board b = Board("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        Board b = Board(wordlist_file, trie_file, extensions_file);
         ASSERT_TRUE(b.contains("AA"));
         ASSERT_TRUE(b.contains("AB"));
         ASSERT_TRUE(b.contains("CAKE"));

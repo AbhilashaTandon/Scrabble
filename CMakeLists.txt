@@ -54,6 +54,8 @@ enable_testing()
 
 add_executable(
   scrabble_test
+  src/test.cpp
+  include/test.h
   tests/helper_test.cpp
   tests/board_test.cpp
   tests/test_gtest.cpp

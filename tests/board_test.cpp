@@ -1,10 +1,17 @@
 
 #include "../include/board.h"
+#include "../include/test.h"
 #include "../include/parse_gcg.h"
 #include <cassert>
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <utility>
+
+TEST(BoardTests, CLI_args){
+        ASSERT_TRUE(wordlist_file != "");
+        ASSERT_TRUE(trie_file != "");
+        ASSERT_TRUE(extensions_file != "");
+}
 
 TEST(BoardTests, HorizontalWord) {
 
@@ -17,8 +24,7 @@ TEST(BoardTests, HorizontalWord) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board("../wordlists/NWL2023-modified.txt",
-                        "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        Board b = Board(wordlist_file, trie_file, extensions_file);
         b.set_rack("ACADEMY");
         EXPECT_TRUE(b.make_play(play).size() > 0);
 
@@ -30,8 +36,7 @@ TEST(BoardTests, HorizontalWord) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        b = Board("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt",
-                  "../wordlists/extensions.txt");
+        b = Board(wordlist_file, trie_file, extensions_file);
         b.set_rack("KFJALSD");
         EXPECT_FALSE(b.make_play(play).size() > 0);
 }
@@ -46,15 +51,13 @@ TEST(BoardTests, Gap) {
         play[5] = std::make_pair(Tile::A, get_pos(8, 7));
         play[6] = std::make_pair(Tile::N, get_pos(9, 7));
 
-        Board b = Board("../wordlists/NWL2023-modified.txt",
-                        "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        Board b = Board(wordlist_file, trie_file, extensions_file);
         b.set_rack("EBBMAN");
         EXPECT_FALSE(b.make_play(play).size() > 0);
 }
 
 TEST(BoardTests, Overlap) {
-        Board b = Board("../wordlists/NWL2023-modified.txt",
-                        "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        Board b = Board(wordlist_file, trie_file, extensions_file);
         std::array<tile_place_t, 7> play;
 
         play[0] = std::make_pair(Tile::A, get_pos(14, 4));
@@ -70,8 +73,7 @@ TEST(BoardTests, Overlap) {
 }
 
 TEST(BoardTests, Vertical) {
-        Board b = Board("../wordlists/NWL2023-modified.txt",
-                        "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        Board b = Board(wordlist_file, trie_file, extensions_file);
         std::array<tile_place_t, 7> play;
 
         play[0] = std::make_pair(Tile::A, get_pos(14, 4));
@@ -87,8 +89,7 @@ TEST(BoardTests, Vertical) {
 }
 
 TEST(BoardTests, Separated) {
-        Board b = Board("../wordlists/NWL2023-modified.txt",
-                        "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        Board b = Board(wordlist_file, trie_file, extensions_file);
         std::array<tile_place_t, 7> play;
 
         play[0] = std::make_pair(Tile::A, get_pos(0, 0));
@@ -113,8 +114,7 @@ TEST(BoardTests, CrissCross) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board("../wordlists/NWL2023-modified.txt",
-                        "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        Board b = Board(wordlist_file, trie_file, extensions_file);
         b.set_rack("ACADEMY");
         EXPECT_TRUE(b.make_play(play).size() > 0);
 
@@ -141,8 +141,7 @@ TEST(BoardTests, AddOneTile) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board("../wordlists/NWL2023-modified.txt",
-                        "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        Board b = Board(wordlist_file, trie_file, extensions_file);
         b.set_rack("ACADEMY");
         EXPECT_TRUE(b.make_play(play).size() > 0);
 
@@ -169,8 +168,7 @@ TEST(BoardTests, FirstMovePass) {
         play[5] = std::make_pair(Tile::NONE, get_pos(8, 7));
         play[6] = std::make_pair(Tile::NONE, get_pos(9, 7));
 
-        Board b = Board("../wordlists/NWL2023-modified.txt",
-                        "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        Board b = Board(wordlist_file, trie_file, extensions_file);
         EXPECT_FALSE(b.make_play(play).size() > 0);
 }
 
@@ -185,8 +183,7 @@ TEST(BoardTests, SecondMovePass) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board("../wordlists/NWL2023-modified.txt",
-                        "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        Board b = Board(wordlist_file, trie_file, extensions_file);
         b.set_rack("ACADEMY");
         EXPECT_TRUE(b.make_play(play).size() > 0);
 
@@ -212,8 +209,7 @@ TEST(BoardTests, NewWords) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board("../wordlists/NWL2023-modified.txt",
-                        "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        Board b = Board(wordlist_file, trie_file, extensions_file);
 
         b.set_rack("ACADEMY");
         EXPECT_TRUE(b.make_play(play).size() > 0);
@@ -254,8 +250,7 @@ TEST(BoardTests, NewWords2) {
         play[5] = std::make_pair(Tile::S, get_pos(8, 7));
         play[6] = std::make_pair(Tile::NONE, get_pos(9, 7));
 
-        Board b = Board("../wordlists/NWL2023-modified.txt",
-                        "../wordlists/trie.txt", "../wordlists/extensions.txt");
+        Board b = Board(wordlist_file, trie_file, extensions_file);
 
         b.set_rack("ACTORS");
         EXPECT_TRUE(b.make_play(play).size() > 0);
