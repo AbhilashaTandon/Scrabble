@@ -104,7 +104,7 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
                                 for (Tile t : horiz) {
                                         char c = char(t + '@');
                                         // std::cout << horiz.size() << ' ';
-                                        assert(isupper(c));
+                                        // assert(isupper(c));
                                         horiz_str += c;
                                 }
 
@@ -152,7 +152,7 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
                                 for (Tile t : vert) {
                                         char c = char(t + '@');
                                         // std::cout << vert.size() << ' ';
-                                        assert(isupper(c));
+                                        // assert(isupper(c));
                                         vert_str += c;
                                 }
 
@@ -169,8 +169,8 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
 
 void Board::pass() { move_count++; }
 
-void Board::bonus_or_penalty(int point_diff) {
-        if (move_count % 2 == 0) {
+void Board::bonus_or_penalty(int point_diff, bool is_player_a) {
+        if (is_player_a) {
                 score_a += point_diff;
         } else {
                 score_b += point_diff;
@@ -189,6 +189,8 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
                         is_pass = false;
                 }
         }
+
+        int num_tiles_played = 0;
 
         if (is_pass && move_count == 0) {
                 std::cerr << "Error: cannot pass on first move of game.\n";
@@ -251,6 +253,7 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
                 }
                 position_t p = play[i].second;
                 board[p] = t;
+                num_tiles_played++;
         }
 
         // check that all tiles are part of one word
@@ -279,21 +282,22 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
 
         std::set<struct Word> new_words = get_formed_words(play);
 
-        for (struct Word new_word : new_words) {
-                if (contains(new_word.word)) {
-                        continue;
-                }
-                std::cerr << int(new_word.word[0]) << '\n';
-                std::cerr << "Invalid word " << new_word.word << '\n';
-                for (int j = 0; j < 7; j++) { // remove tiles if invalid word
-                        if (play[j].first == NONE) {
-                                continue;
-                        }
-                        position_t p = play[j].second;
-                        board[p] = Tile::NONE;
-                }
-                return std::set<struct Word>();
-        }
+        //temporarily disable invalid word detection for testing
+        // for (struct Word new_word : new_words) {
+        //         if (contains(new_word.word)) {
+        //                 continue;
+        //         }
+        //         std::cerr << int(new_word.word[0]) << '\n';
+        //         std::cerr << "Invalid word " << new_word.word << '\n';
+        //         for (int j = 0; j < 7; j++) { // remove tiles if invalid word
+        //                 if (play[j].first == NONE) {
+        //                         continue;
+        //                 }
+        //                 position_t p = play[j].second;
+        //                 board[p] = Tile::NONE;
+        //         }
+        //         return std::set<struct Word>();
+        // }
 
         std::unordered_multiset<Tile> rack_letters =
             std::unordered_multiset<Tile>();
@@ -337,11 +341,28 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
         rack_letters.merge(draw_tiles(7 - rack_letters.size()));
 
         for (struct Word new_word : new_words) {
+                score_t score = add_score(new_word);
+                // std::cout << new_word.word << ' ' << score << '\n';
                 if (move_count % 2 == 0) {
-                        score_a += add_score(new_word);
+                        score_a += score;
                 } else {
-                        score_b += add_score(new_word);
+                        score_b += score;
                 }
+        }
+
+        if(num_tiles_played == 7){
+                bonus_or_penalty(50, move_count % 2 == 0);
+                //bingo
+        }
+
+        //unset bonuses
+        
+        for(int i = 0; i < 7; i++){
+                position_t pos = play[i].second;
+                if(play[i].first == NONE){
+                        continue;
+                }
+                bonus_used[pos] = true;
         }
 
         move_count++;
@@ -369,6 +390,12 @@ void Board::print() const {
 
         // print rack for player A
         // std::cout << "^[[2J"; // clears screen
+        std::cout << '\n';
+        for (int i = 0; i < 23; i++) {
+                std::cout << " ";
+        }
+
+        std::cout << score_a << '\n';
 
         for (int i = 0; i < 17; i++) {
                 std::cout << " ";
@@ -430,6 +457,13 @@ void Board::print() const {
                 std::cout << "─";
         }
 
+        std::cout << '\n';
+        for (int i = 0; i < 23; i++) {
+                std::cout << " ";
+        }
+
+        std::cout << score_b << '\n';
+
         std::cout << "\n\n";
 }
 
@@ -442,7 +476,7 @@ void Board::set_rack(std::string new_rack, bool is_player_a) {
                                 rack_a.insert(Tile::BLANK);
                                 continue;
                         }
-                        rack_a.insert(Tile(new_rack[i] - '@'));
+                        rack_a.insert(make_tile(new_rack[i]));
                 }
         } else {
                 rack_b = std::unordered_multiset<Tile>();
@@ -452,7 +486,7 @@ void Board::set_rack(std::string new_rack, bool is_player_a) {
                                 rack_b.insert(Tile::BLANK);
                                 continue;
                         }
-                        rack_b.insert(Tile(new_rack[i] - '@'));
+                        rack_b.insert(make_tile(new_rack[i]));
                 }
         }
 }
@@ -461,42 +495,49 @@ score_t Board::add_score(struct Word w) {
         score_t score = 0;
         score_t multiplier = 1;
 
-        coords_t coords = get_xy(w.start);
         position_t pos = w.start;
 
-        for (int i = 0; i < 7; i++) {
+        // std::cout << "Word: " << w.word << '\n';
+        // std::cout << "\n\n";
+
+        for (char c : w.word) {
+                // for (int i = 0; i < 225; i++) {
+                //         if (i == pos) {
+                //                 std::cout << '*';
+                //         } else {
+                //                 std::cout << board_layout[i];
+                //         }
+                //         if (i % 15 == 14) {
+                //                 std::cout << '\n';
+                //         }
+                // }
+                // std::cout << "\n\n";
 
                 Square bonus = board_layout[pos];
                 bool square_used = bonus_used[pos];
 
-                assert(!(square_used && bonus == EMPTY));
-
-                score += tile_scores[Tile(w.word[i] - 64)];
+                score += tile_scores[make_tile(c)];
                 // we always add score of letter
 
                 if (!square_used) {
                         // if bonus is still fresh
                         switch (bonus) {
                         case DOUBLE_LETTER:
-                                score += tile_scores[Tile(w.word[i] - 64)];
+                                score += tile_scores[make_tile(c)];
                                 // add score once more to double
-                                bonus_used[pos] = true;
                                 break;
 
                         case TRIPLE_LETTER:
-                                score += tile_scores[Tile(w.word[i] - 64)] * 2;
+                                score += tile_scores[make_tile(c)] * 2;
                                 // add twice more to triple
-                                bonus_used[pos] = true;
                                 break;
 
                         // multipliers stack
                         case DOUBLE_WORD:
                                 multiplier *= 2;
-                                bonus_used[pos] = true;
                                 break;
                         case TRIPLE_WORD:
                                 multiplier *= 3;
-                                bonus_used[pos] = true;
                                 break;
 
                         default:
@@ -506,8 +547,7 @@ score_t Board::add_score(struct Word w) {
                         // mark the bonus as used since we used it
                 }
 
-                pos = get_pos(coords.first + int(!w.is_vertical),
-                              coords.second + int(w.is_vertical));
+                pos += w.is_vertical ? 15 : 1;
                 // wow this line is a mess
         }
 

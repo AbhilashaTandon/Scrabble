@@ -36,7 +36,7 @@ class Board {
         bool contains(std::string word) const;
         void end_game();
 
-        void bonus_or_penalty(int point_diff);
+        void bonus_or_penalty(int point_diff, bool is_player_a);
 
         score_t get_score(bool player_a);
 

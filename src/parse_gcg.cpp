@@ -1,5 +1,4 @@
 #include "../include/parse_gcg.h"
-#include "../include/parse_gcg.h"
 #include <cassert>
 #include <cctype>
 #include <fstream>
@@ -8,8 +7,7 @@
 #include <string>
 
 GCGParser::GCGParser(std::string file_path)
-    : b(wordlist_file, trie_file, extensions_file),
-      file_path(file_path) {
+    : b(wordlist_file, trie_file, extensions_file), file_path(file_path) {
         player1 = "player1";
         player2 = "player2";
 }
@@ -55,10 +53,10 @@ bool GCGParser::validate_game(bool verbose) {
 
                 if (first_word[0] == '>') {
                         // parse actual moves now
+                        if (verbose) {
+                                b.print();
+                        }
                         if (!parse_move(line, verbose)) {
-                                if (verbose) {
-                                        b.print();
-                                }
                                 return false;
                         }
                 }
@@ -114,17 +112,19 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
         stream >> position;
 
         if (position == "(challenge)") {
+                std::cout << "Previous word challenged!\n";
                 stream >> point_difference;
                 stream >> updated_score;
 
-                b.bonus_or_penalty(point_difference);
+                b.bonus_or_penalty(point_difference, is_player_1);
 
                 return b.get_score(is_player_1) == updated_score;
         } else if (position == "(time)") {
+                std::cout << "Time limit exceeded!\n";
                 stream >> point_difference;
                 stream >> updated_score;
 
-                b.bonus_or_penalty(point_difference);
+                b.bonus_or_penalty(point_difference, is_player_1);
 
                 return b.get_score(is_player_1) == updated_score;
         } else if (position[0] == '(') {
@@ -139,11 +139,12 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
                 return true;
 
         } else if (position == "--") {
+                std::cout << "Withdrawal of challenged phoney!\n";
                 // Withdrawal of challenged phoney
                 stream >> point_difference;
                 stream >> updated_score;
 
-                b.bonus_or_penalty(point_difference);
+                b.bonus_or_penalty(point_difference, is_player_1);
 
                 return b.get_score(is_player_1) == updated_score;
         } else if (position[0] == '-') {
@@ -235,13 +236,9 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
                                   << " is already present\n";
                         return false;
                 }
-                if (isupper(c)) {
+                if (isupper(c) || islower(c)) {
                         play[letter_idx] = std::make_pair(
-                            Tile(c - 'A' + 1), get_pos(x_coord, y_coord));
-                        letter_idx++;
-                } else if (islower(c)) {
-                        play[letter_idx] = std::make_pair(
-                            Tile(c - 'a' + 1), get_pos(x_coord, y_coord));
+                            make_tile(c), get_pos(x_coord, y_coord));
                         letter_idx++;
                 } else if (c != '.') {
                         std::cerr << c << ": not a valid character\n";
@@ -259,16 +256,16 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
 
         if (!result && verbose) {
                 b.print();
+                std::cerr << "Invalid move!\n";
                 std::cout << line << '\n';
         }
 
-
         bool correct_score = b.get_score(is_player_1) == updated_score;
 
-        if(!correct_score){
-                std::cout << b.get_score(is_player_1) << " != " << updated_score << '\n';
+        if (!correct_score) {
+                std::cout << b.get_score(is_player_1) << " != " << updated_score
+                          << '\n';
         }
-
 
         return result && correct_score;
 }

@@ -35,9 +35,10 @@ bool is_letter_bonus(Square sq){
 
 Tile make_tile(char c){
         if (isupper(c)) {
-                return Tile(c - 'A');
+                return Tile(c - 'A' + 1);
         } else if (islower(c)) {
-                return Tile(c - 'a');
+                return Tile(c - 'a' + 30 );
+                //convert to blank variant
         } else {
                 return Tile::NONE;
         }

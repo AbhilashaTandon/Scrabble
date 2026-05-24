@@ -95,7 +95,7 @@ std::vector<std::string> Trie::parse_trie_file(std::string file_path) {
 
         std::string line;
         std::vector<std::string> wordlist = std::vector<std::string>();
-        int num_nodes = 0;
+        // int num_nodes = 0;
 
         while (std::getline(file, line)) {
                 // parse line by line
@@ -116,7 +116,7 @@ std::vector<std::string> Trie::parse_trie_file(std::string file_path) {
                 struct TrieNode *current = &this->root;
                 for (char c : tree_path) {
                         // build tree
-                        Tile t = isupper(c) ? Tile(c - 64) : Tile(c - 96);
+                        Tile t = isupper(c) ? make_tile(c) : make_tile(c - 32);
                         if (current->letter == NONE) {
                                 current->letter = t;
                         } else {
@@ -128,7 +128,7 @@ std::vector<std::string> Trie::parse_trie_file(std::string file_path) {
                                         struct TrieNode *child = new struct TrieNode(
                                             0, 0, NULL, NULL, NONE);
                                         current->left = child;
-                                        num_nodes++;
+                                        // num_nodes++;
                                 }
                                 current = current->left;
                         } else {
@@ -136,7 +136,7 @@ std::vector<std::string> Trie::parse_trie_file(std::string file_path) {
                                         struct TrieNode *child = new struct TrieNode(
                                             0, 0, NULL, NULL, NONE);
                                         current->right = child;
-                                        num_nodes++;
+                                        // num_nodes++;
                                 }
                                 current = current->right;
                         }

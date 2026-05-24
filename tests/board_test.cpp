@@ -284,7 +284,7 @@ TEST(BoardTests, StressTest) {
                 bool game_result = parser.validate_game(false);
                 if (!game_result) {
                         std::cout << entry.path() << std::endl;
-                        parser.validate_game(true);
+                        // parser.validate_game(true);
                 }
                 EXPECT_TRUE(game_result);
         }

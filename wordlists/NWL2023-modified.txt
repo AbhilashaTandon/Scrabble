@@ -91929,6 +91929,7 @@ KNURLY {gnarly=adj} [adj KNURLIER, KNURLIEST]
 KNURR {knur=n} [n KNURRS]
 KNURRS <knurr=n> [n]
 KNURS <knur=n> [n]
+KO
 KOA a timber tree [n KOAS]
 KOALA an Australian mammal [n KOALAS]
 KOALAS <koala=n> [n]
