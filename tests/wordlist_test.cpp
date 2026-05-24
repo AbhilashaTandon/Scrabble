@@ -1,8 +1,8 @@
 
 #include "../include/wordlist.h"
 #include "../include/board.h"
-#include "../include/test.h"
-#include "gtest/gtest.h"
+#include "../include/parse_cli_args.h"
+#include <gtest/gtest.h>
 
 TEST(WordlistTests, WordTests) {
         WordList w = WordList(wordlist_file, trie_file);

@@ -24,6 +24,7 @@ SOURCES
         src/wordlist.cpp
         src/trie.cpp
         src/parse_gcg.cpp
+        src/parse_cli_args.cpp
         include/board.h
         include/extensions.h
         include/trie.h
@@ -32,6 +33,7 @@ SOURCES
         include/print.h
         include/wordlist.h
         include/parse_gcg.h
+        include/parse_cli_args.h
 )
 
 add_executable(scrabble_debug
@@ -55,7 +57,6 @@ enable_testing()
 add_executable(
   scrabble_test
   src/test.cpp
-  include/test.h
   tests/helper_test.cpp
   tests/board_test.cpp
   tests/test_gtest.cpp
