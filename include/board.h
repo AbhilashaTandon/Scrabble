@@ -40,7 +40,7 @@ class Board {
 
         score_t get_score(bool player_a);
 
-        void set_rack(std::string new_rack);
+        void set_rack(std::string new_rack, bool is_player_a);
 
         char get_letter(uint8_t x, uint8_t y) const;
 

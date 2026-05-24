@@ -4,6 +4,7 @@
 #define PARSE_GCG_H
 #include "board.h"
 #include "helper.h"
+#include "parse_cli_args.h"
 
 class GCGParser {
 public:

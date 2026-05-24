@@ -1,4 +1,5 @@
 #include "../include/parse_gcg.h"
+#include "../include/parse_gcg.h"
 #include <cassert>
 #include <cctype>
 #include <fstream>
@@ -7,8 +8,7 @@
 #include <string>
 
 GCGParser::GCGParser(std::string file_path)
-    : b("../wordlists/NWL2023-modified.txt", "../wordlists/trie.txt",
-        "../wordlists/extensions.txt"),
+    : b(wordlist_file, trie_file, extensions_file),
       file_path(file_path) {
         player1 = "player1";
         player2 = "player2";
@@ -109,7 +109,7 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
                 return true;
         }
 
-        b.set_rack(rack);
+        b.set_rack(rack, is_player_1);
 
         stream >> position;
 
@@ -262,5 +262,13 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
                 std::cout << line << '\n';
         }
 
-        return result;
+
+        bool correct_score = b.get_score(is_player_1) == updated_score;
+
+        if(!correct_score){
+                std::cout << b.get_score(is_player_1) << " != " << updated_score << '\n';
+        }
+
+
+        return result && correct_score;
 }

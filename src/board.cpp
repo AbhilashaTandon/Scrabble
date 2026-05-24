@@ -351,10 +351,10 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
 std::unordered_multiset<Tile> Board::draw_tiles(tilecount_t num_tiles) {
         std::unordered_multiset<Tile> selection =
             std::unordered_multiset<Tile>();
-        if (bag.size() == 0) {
-                return selection;
-        }
         for (tilecount_t i = 0; i < num_tiles; i++) {
+                if (bag.size() == 0) {
+                        return selection;
+                }
                 int index = std::rand() % bag.size();
                 Tile t = bag[index];
                 selection.insert(t);
@@ -433,8 +433,8 @@ void Board::print() const {
         std::cout << "\n\n";
 }
 
-void Board::set_rack(std::string new_rack) {
-        if (move_count % 2 == 0) {
+void Board::set_rack(std::string new_rack, bool is_player_a) {
+        if (is_player_a) {
                 rack_a = std::unordered_multiset<Tile>();
                 size_t i = 0;
                 for (; i < new_rack.size(); i++) {
