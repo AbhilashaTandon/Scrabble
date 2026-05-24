@@ -4,8 +4,8 @@
 #include "helper.h"
 #include "wordlist.h"
 #include <array>
-#include <unordered_set>
 #include <cstdint>
+#include <unordered_set>
 #include <vector>
 
 struct Word {
@@ -29,9 +29,13 @@ class Board {
       public:
         Board(std::string wordlist_file_path, std::string trie_file_path,
               std::string ext_file_path);
+
         std::set<struct Word> make_play(std::array<tile_place_t, 7>);
         void pass();
-  //these cant be struct Words because its legal to play non-adjacent tiles if there are existing tiles between them that form a word
+        bool exchange_letters(std::string letters_to_remove);
+
+        // these cant be struct Words because its legal to play non-adjacent
+        // tiles if there are existing tiles between them that form a word
         void print() const;
         bool contains(std::string word) const;
         void end_game();
@@ -43,7 +47,6 @@ class Board {
         void set_rack(std::string new_rack, bool is_player_a);
 
         char get_letter(uint8_t x, uint8_t y) const;
-
 
       private:
         score_t score_a;
@@ -70,5 +73,8 @@ class Board {
         // we mark this as true whenever a move uses a bonus square
 
         score_t add_score(struct Word w);
+
+        std::unordered_multiset<Tile>
+        remove_tiles_from_rack(std::string letters_to_remove);
 };
 #endif

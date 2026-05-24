@@ -282,63 +282,44 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
 
         std::set<struct Word> new_words = get_formed_words(play);
 
-        //temporarily disable invalid word detection for testing
-        // for (struct Word new_word : new_words) {
-        //         if (contains(new_word.word)) {
-        //                 continue;
-        //         }
-        //         std::cerr << int(new_word.word[0]) << '\n';
-        //         std::cerr << "Invalid word " << new_word.word << '\n';
-        //         for (int j = 0; j < 7; j++) { // remove tiles if invalid word
-        //                 if (play[j].first == NONE) {
-        //                         continue;
-        //                 }
-        //                 position_t p = play[j].second;
-        //                 board[p] = Tile::NONE;
-        //         }
-        //         return std::set<struct Word>();
-        // }
+        // temporarily disable invalid word detection for testing
+        //  for (struct Word new_word : new_words) {
+        //          if (contains(new_word.word)) {
+        //                  continue;
+        //          }
+        //          std::cerr << int(new_word.word[0]) << '\n';
+        //          std::cerr << "Invalid word " << new_word.word << '\n';
+        //          for (int j = 0; j < 7; j++) { // remove tiles if invalid
+        //          word
+        //                  if (play[j].first == NONE) {
+        //                          continue;
+        //                  }
+        //                  position_t p = play[j].second;
+        //                  board[p] = Tile::NONE;
+        //          }
+        //          return std::set<struct Word>();
+        //  }
 
-        std::unordered_multiset<Tile> rack_letters =
-            std::unordered_multiset<Tile>();
+        std::string letters_played = "";
 
-        std::unordered_multiset<Tile> current_players_rack =
-            move_count % 2 == 0 ? rack_a : rack_b;
-
-        for (Tile t : current_players_rack) {
-                rack_letters.insert(t);
-        }
-
-        assert(rack_letters.size() == current_players_rack.size());
-
-        for (int i = 0; i < 7; i++) {
-                if (play[i].first == NONE) {
+        for(int i = 0; i < 7; i++){
+                if(play[i].first == Tile::NONE){
                         continue;
                 }
-                if (rack_letters.contains(play[i].first)) {
-                        const auto it = rack_letters.find(play[i].first);
-                        assert(it != rack_letters.end());
-                        rack_letters.erase(it);
-                } else {
-
-                        const auto it = rack_letters.find(Tile::BLANK);
-                        if (it != rack_letters.end()) {
-                                rack_letters.erase(it);
-                                continue;
-                        }
-                        std::cerr << "Play contains tiles ("
-                                  << char(play[i].first + '@')
-                                  << ") not found on "
-                                     "player's rack: ";
-                        for (Tile t : current_players_rack) {
-                                std::cerr << char(t + '@');
-                        }
-                        std::cerr << ".\n";
-                        return std::set<struct Word>();
-                }
+                letters_played += char(play[i].first + '@');
         }
 
-        rack_letters.merge(draw_tiles(7 - rack_letters.size()));
+        std::unordered_multiset<Tile> new_rack = remove_tiles_from_rack(letters_played);
+
+        if (new_rack.empty()) {
+                return std::set<struct Word>();
+        }
+
+        if (move_count % 2 == 0) {
+                rack_a = new_rack;
+        } else {
+                rack_b = new_rack;
+        }
 
         for (struct Word new_word : new_words) {
                 score_t score = add_score(new_word);
@@ -350,16 +331,16 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
                 }
         }
 
-        if(num_tiles_played == 7){
+        if (num_tiles_played == 7) {
                 bonus_or_penalty(50, move_count % 2 == 0);
-                //bingo
+                // bingo
         }
 
-        //unset bonuses
-        
-        for(int i = 0; i < 7; i++){
+        // unset bonuses
+
+        for (int i = 0; i < 7; i++) {
                 position_t pos = play[i].second;
-                if(play[i].first == NONE){
+                if (play[i].first == NONE) {
                         continue;
                 }
                 bonus_used[pos] = true;
@@ -558,3 +539,52 @@ char Board::get_letter(uint8_t x, uint8_t y) const {
         Tile t = board[get_pos(x, y)];
         return char(t + 'A' - 1);
 }
+
+std::unordered_multiset<Tile>
+Board::remove_tiles_from_rack(std::string letters_to_remove) {
+        std::unordered_multiset<Tile> rack_letters =
+            std::unordered_multiset<Tile>();
+
+        std::unordered_multiset<Tile> current_players_rack =
+            move_count % 2 == 0 ? rack_a : rack_b;
+
+        for (Tile t : current_players_rack) {
+                rack_letters.insert(t);
+        }
+
+        assert(rack_letters.size() == current_players_rack.size());
+
+        for (char c : letters_to_remove) {
+                Tile t = make_tile(c)   ;
+                if (rack_letters.contains(t)) {
+                        const auto it = rack_letters.find(t);
+                        assert(it != rack_letters.end());
+                        rack_letters.erase(it);
+                } else {
+
+                        const auto it = rack_letters.find(Tile::BLANK);
+                        if (it != rack_letters.end()) {
+                                rack_letters.erase(it);
+                                continue;
+                        }
+                        std::cerr << "Play contains tiles ("
+                                  << c
+                                  << ") not found on "
+                                     "player's rack: ";
+                        for (Tile x : current_players_rack) {
+                                std::cerr << char(x + '@');
+                        }
+                        std::cerr << ".\n";
+                        return std::unordered_multiset<Tile>();
+                }
+        }
+
+        rack_letters.merge(draw_tiles(7 - rack_letters.size()));
+
+        return rack_letters;
+}
+
+// bool Board::exchange_letters(
+//     std::unordered_multiset<Tile> letters_to_exchange) {
+//         remove_tiles_from_rack(letters_to_exchange);
+// }

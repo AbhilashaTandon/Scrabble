@@ -37,7 +37,7 @@ TEST(BoardTests, HorizontalWord) {
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
         b = Board(wordlist_file, trie_file, extensions_file);
-        b.set_rack("KFJALSD", false);
+        b.set_rack("KFJALSD", true);
         EXPECT_FALSE(b.make_play(play).size() > 0);
 }
 
