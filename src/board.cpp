@@ -177,7 +177,7 @@ void Board::bonus_or_penalty(int point_diff) {
         }
 }
 
-int Board::get_score(bool player_a) { return player_a ? score_a : score_b; }
+score_t Board::get_score(bool player_a) { return player_a ? score_a : score_b; }
 
 std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
         // to be a valid scrabble move all letters must be in either one row or
@@ -351,6 +351,9 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
 std::unordered_multiset<Tile> Board::draw_tiles(tilecount_t num_tiles) {
         std::unordered_multiset<Tile> selection =
             std::unordered_multiset<Tile>();
+        if (bag.size() == 0) {
+                return selection;
+        }
         for (tilecount_t i = 0; i < num_tiles; i++) {
                 int index = std::rand() % bag.size();
                 Tile t = bag[index];
@@ -454,9 +457,9 @@ void Board::set_rack(std::string new_rack) {
         }
 }
 
-uint16_t Board::add_score(struct Word w) {
-        uint16_t score = 0;
-        uint16_t multiplier = 1;
+score_t Board::add_score(struct Word w) {
+        score_t score = 0;
+        score_t multiplier = 1;
 
         coords_t coords = get_xy(w.start);
         position_t pos = w.start;

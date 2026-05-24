@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-typedef uint16_t score_t;
+typedef int16_t score_t;
 typedef uint8_t tilecount_t;
 typedef uint8_t position_t;
 typedef std::pair<uint8_t, uint8_t> coords_t;

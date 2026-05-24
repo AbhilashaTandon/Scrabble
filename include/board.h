@@ -38,7 +38,7 @@ class Board {
 
         void bonus_or_penalty(int point_diff);
 
-        int get_score(bool player_a);
+        score_t get_score(bool player_a);
 
         void set_rack(std::string new_rack);
 
@@ -46,8 +46,8 @@ class Board {
 
 
       private:
-        int score_a;
-        int score_b;
+        score_t score_a;
+        score_t score_b;
         std::vector<Tile> bag;
         Tile board[225];
         std::unordered_multiset<Tile> rack_a;
@@ -69,6 +69,6 @@ class Board {
         std::array<bool, 225> bonus_used;
         // we mark this as true whenever a move uses a bonus square
 
-        uint16_t add_score(struct Word w);
+        score_t add_score(struct Word w);
 };
 #endif
