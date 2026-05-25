@@ -1,0 +1,45 @@
+#character-encoding UTF-8
+#player1 Roy_Kamen Roy Kamen
+#player2 Dustin_Dean Dustin Dean
+>Roy_Kamen: GINNORT -N +0 0
+>Dustin_Dean: ACEEIOU -AEIOU +0 0
+#note exchanging EIOU is best 
+>Roy_Kamen: BGINORT -B +0 0
+>Dustin_Dean: ?ACEGNR 8F ANERGiC +74 74
+#note CaRNAGE with A on the star is best
+>Roy_Kamen: GINORRT L8 .OR +5 5
+>Dustin_Dean: JO J6 JO. +27 101
+>Roy_Kamen: FGINRTY H7 G.NTRIFY +66 71
+>Dustin_Dean: EHLOPST F7 T.PHOLES +73 174
+#note (I)SOPLETH is best, followed by (F)LESHPOT, both scoring 84
+>Roy_Kamen: AEIIIKP 11J PIKI +30 101
+>Dustin_Dean: DEHO E10 OHED +36 210
+>Roy_Kamen: AAADEIS G7 A.A +16 117
+>Dustin_Dean: EZ 14H .EZ +35 245
+>Roy_Kamen: ADEILST D4 DILATES +74 191
+>Dustin_Dean: EGV C3 VEG +20 265
+>Roy_Kamen: BBFIINO C7 FIB +33 224
+>Dustin_Dean: IIIUUU -IIIUUU +0 265
+#note actual tiles unknown
+>Roy_Kamen: BEINOTT D12 BOT +24 248
+#note scored as 28
+>Dustin_Dean: X 9L .X +17 282
+>Roy_Kamen: AEEEINR I8 .EE +13 261
+>Dustin_Dean: NOR M11 .NRO +8 290
+>Roy_Kamen: AEIINRV 15I RAIN +18 279
+>Dustin_Dean: CENT 15A CENT +28 318
+#note scored as 18
+>Roy_Kamen: EIMOOSV N8 VOES +30 309
+>Dustin_Dean: ALRU 6J .URAL +14 332
+>Roy_Kamen: AILMMOU 5K MOLA +26 335
+>Dustin_Dean: QU 8A QU.. +39 371
+>Roy_Kamen: AIIMSTU 14B MU. +20 355
+>Dustin_Dean: ?ADDENU 4F UNDAtED +83 454
+#note Champ likes UNAdDED or UNAiDED better, even though they score 2 less
+>Roy_Kamen: AEIIIST E5 TI +14 369
+#note scored as 12
+>Dustin_Dean: WWY I3 Y.W +13 467
+>Roy_Kamen: AEIIS I12 SE.. +13 382
+>Dustin_Dean: W M5 ..W +10 477
+>Dustin_Dean:  (AII) +6 483
+#note final score recorded as 473-384
