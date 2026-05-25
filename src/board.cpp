@@ -63,6 +63,8 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
                 if (tile.first == Tile::NONE) {
                         continue;
                 }
+
+                // horizontal words
                 {
                         std::deque<Tile> horiz;
 
@@ -83,6 +85,8 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
 
                         x_word_start++;
 
+                        std::cout << x_word_start << " ";
+
                         int x_word_end =
                             x_coord + 1; // find last char of horizontal word
                         while (x_word_end < 15 &&
@@ -97,6 +101,8 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
                         }
 
                         x_word_end--;
+
+                        std::cout << x_word_end << "\n";
 
                         if (horiz_len >= 2) {
                                 // single tiles don't count as words
@@ -116,6 +122,7 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
                         }
                 }
 
+                // vertical words
                 {
                         std::deque<Tile> vert;
                         int vert_len = 0;
@@ -134,6 +141,8 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
 
                         y_word_start++;
 
+                        std::cout << y_word_start << " ";
+
                         int y_word_end =
                             y_coord + 1; // find last char of vertical word
                         while (y_word_end < 15 &&
@@ -145,6 +154,8 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
                         }
 
                         y_word_end--;
+
+                        std::cout << y_word_end << "\n";
 
                         if (vert_len >= 2) {
                                 // single tiles don't count as words
@@ -164,6 +175,7 @@ Board::get_formed_words(std::array<tile_place_t, 7> play) {
                         }
                 }
         }
+
         return formed_words;
 }
 
@@ -302,28 +314,21 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
 
         std::string letters_played = "";
 
-        for(int i = 0; i < 7; i++){
-                if(play[i].first == Tile::NONE){
+        for (int i = 0; i < 7; i++) {
+                if (play[i].first == Tile::NONE) {
                         continue;
                 }
                 letters_played += char(play[i].first + '@');
         }
 
-        std::unordered_multiset<Tile> new_rack = remove_tiles_from_rack(letters_played);
+        if (!remove_tiles_from_rack(letters_played)) {
 
-        if (new_rack.empty()) {
                 return std::set<struct Word>();
-        }
-
-        if (move_count % 2 == 0) {
-                rack_a = new_rack;
-        } else {
-                rack_b = new_rack;
         }
 
         for (struct Word new_word : new_words) {
                 score_t score = add_score(new_word);
-                // std::cout << new_word.word << ' ' << score << '\n';
+                std::cout << new_word.word << ' ' << score << '\n';
                 if (move_count % 2 == 0) {
                         score_a += score;
                 } else {
@@ -478,22 +483,7 @@ score_t Board::add_score(struct Word w) {
 
         position_t pos = w.start;
 
-        // std::cout << "Word: " << w.word << '\n';
-        // std::cout << "\n\n";
-
         for (char c : w.word) {
-                // for (int i = 0; i < 225; i++) {
-                //         if (i == pos) {
-                //                 std::cout << '*';
-                //         } else {
-                //                 std::cout << board_layout[i];
-                //         }
-                //         if (i % 15 == 14) {
-                //                 std::cout << '\n';
-                //         }
-                // }
-                // std::cout << "\n\n";
-
                 Square bonus = board_layout[pos];
                 bool square_used = bonus_used[pos];
 
@@ -524,12 +514,8 @@ score_t Board::add_score(struct Word w) {
                         default:
                                 break;
                         }
-
-                        // mark the bonus as used since we used it
                 }
-
                 pos += w.is_vertical ? 15 : 1;
-                // wow this line is a mess
         }
 
         return score * multiplier;
@@ -540,8 +526,7 @@ char Board::get_letter(uint8_t x, uint8_t y) const {
         return char(t + 'A' - 1);
 }
 
-std::unordered_multiset<Tile>
-Board::remove_tiles_from_rack(std::string letters_to_remove) {
+bool Board::remove_tiles_from_rack(std::string letters_to_remove) {
         std::unordered_multiset<Tile> rack_letters =
             std::unordered_multiset<Tile>();
 
@@ -555,7 +540,7 @@ Board::remove_tiles_from_rack(std::string letters_to_remove) {
         assert(rack_letters.size() == current_players_rack.size());
 
         for (char c : letters_to_remove) {
-                Tile t = make_tile(c)   ;
+                Tile t = make_tile(c);
                 if (rack_letters.contains(t)) {
                         const auto it = rack_letters.find(t);
                         assert(it != rack_letters.end());
@@ -567,24 +552,32 @@ Board::remove_tiles_from_rack(std::string letters_to_remove) {
                                 rack_letters.erase(it);
                                 continue;
                         }
-                        std::cerr << "Play contains tiles ("
-                                  << c
+                        std::cerr << "Play contains tiles (" << c
                                   << ") not found on "
                                      "player's rack: ";
                         for (Tile x : current_players_rack) {
                                 std::cerr << char(x + '@');
                         }
                         std::cerr << ".\n";
-                        return std::unordered_multiset<Tile>();
+                        return false;
                 }
         }
 
         rack_letters.merge(draw_tiles(7 - rack_letters.size()));
 
-        return rack_letters;
+        if (move_count % 2 == 0) {
+                rack_a = rack_letters;
+        } else {
+                rack_b = rack_letters;
+        }
+
+        return true;
 }
 
-// bool Board::exchange_letters(
-//     std::unordered_multiset<Tile> letters_to_exchange) {
-//         remove_tiles_from_rack(letters_to_exchange);
-// }
+bool Board::exchange_letters(std::string letters_to_remove) {
+        if (remove_tiles_from_rack(letters_to_remove)) {
+                move_count++;
+                return true;
+        }
+        return false;
+}

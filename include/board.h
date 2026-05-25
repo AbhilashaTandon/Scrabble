@@ -74,7 +74,6 @@ class Board {
 
         score_t add_score(struct Word w);
 
-        std::unordered_multiset<Tile>
-        remove_tiles_from_rack(std::string letters_to_remove);
+        bool remove_tiles_from_rack(std::string letters_to_remove);
 };
 #endif

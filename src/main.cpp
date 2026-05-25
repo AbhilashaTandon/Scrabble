@@ -3,7 +3,7 @@
 #include "../include/parse_gcg.h"
 #include <cassert>
 // #include <filesystem>
-#include <iostream>
+// #include <iostream>
 
 int main(int argc, char **argv) {
 
@@ -14,8 +14,8 @@ int main(int argc, char **argv) {
                                 std::string(argv[3]), std::string(argv[4]));
         }
         setlocale(LC_ALL, "en_US.UTF-8");
-        GCGParser parser("../games/fivepoint.gcg");
-        std::cout << parser.validate_game(true);
+        GCGParser parser("short_game_with_bad_moves.gcg");
+        parser.validate_game(true);
 
         // std::array<tile_place_t, 7> play;
         // play[0] = std::make_pair(Tile::A, get_pos(3, 7));

@@ -14,7 +14,7 @@ GCGParser::GCGParser(std::string file_path)
 
 bool GCGParser::validate_game(bool verbose) {
 
-        std::fstream file = std::fstream(file_path.c_str(), std::ios_base::in);
+        std::fstream file = std::fstream((games_dir + "/" + file_path).c_str(), std::ios_base::in);
         // read in file
 
         std::string line;
@@ -53,11 +53,11 @@ bool GCGParser::validate_game(bool verbose) {
 
                 if (first_word[0] == '>') {
                         // parse actual moves now
-                        if (verbose) {
-                                b.print();
-                        }
                         if (!parse_move(line, verbose)) {
                                 return false;
+                        }
+                        if (verbose) {
+                                b.print();
                         }
                 }
         }
@@ -149,7 +149,7 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
                 return b.get_score(is_player_1) == updated_score;
         } else if (position[0] == '-') {
                 // tile exchange
-                return true;
+                return b.exchange_letters(position.substr(1));
         }
 
         // parse position
@@ -254,17 +254,18 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
 
         bool result = b.make_play(play).size() > 0;
 
-        if (!result && verbose) {
-                b.print();
-                std::cerr << "Invalid move!\n";
-                std::cout << line << '\n';
-        }
 
         bool correct_score = b.get_score(is_player_1) == updated_score;
 
         if (!correct_score) {
                 std::cout << b.get_score(is_player_1) << " != " << updated_score
                           << '\n';
+        }
+
+        if (!(result && correct_score) && verbose) {
+                b.print();
+                std::cerr << "Error\n";
+                std::cout << line << '\n';
         }
 
         return result && correct_score;
