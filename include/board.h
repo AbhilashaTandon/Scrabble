@@ -48,6 +48,8 @@ class Board {
 
         char get_letter(uint8_t x, uint8_t y) const;
 
+        struct Word get_new_word(tile_place_t tile, bool is_vertical);
+
       private:
         score_t score_a;
         score_t score_b;
@@ -58,7 +60,7 @@ class Board {
         std::uint16_t move_count;
         WordList wordlist;
         std::set<struct Word> get_formed_words(
-            std::array<tile_place_t, 7> play); // gets new words formed by move
+            std::array<tile_place_t, 7> play, bool is_vertical); // gets new words formed by move
 
         extension_map extensions;
 
