@@ -6,3 +6,6 @@ Makefile
 CMakeFiles
 bin/
 TODO.md
+profile.txt
+profile2.txt
+callgrind.*

@@ -50,6 +50,9 @@ class Board {
 
         struct Word get_new_word(tile_place_t tile, bool is_vertical);
 
+      protected:
+        extension_map extensions;
+
       private:
         score_t score_a;
         score_t score_b;
@@ -59,10 +62,9 @@ class Board {
         std::unordered_multiset<Tile> rack_b;
         std::uint16_t move_count;
         WordList wordlist;
-        std::vector<struct Word> get_formed_words(
-            std::array<tile_place_t, 7> play, bool is_vertical); // gets new words formed by move
-
-        extension_map extensions;
+        std::vector<struct Word>
+        get_formed_words(std::array<tile_place_t, 7> play,
+                         bool is_vertical); // gets new words formed by move
 
         std::unordered_multiset<Tile> draw_tiles(tilecount_t num_tiles);
 

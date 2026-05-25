@@ -2,7 +2,7 @@
 
 #ifndef PARSE_GCG_H
 #define PARSE_GCG_H
-#include "board.h"
+#include "bot.h"
 #include "helper.h"
 #include "parse_cli_args.h"
 
@@ -15,7 +15,7 @@ public:
       private:
         std::string player1;
         std::string player2;
-        Board b;
+        Bot b;
         std::string file_path;
 };
 

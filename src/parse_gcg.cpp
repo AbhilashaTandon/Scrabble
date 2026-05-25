@@ -252,7 +252,7 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
                 }
         }
 
-        bool result = b.make_play(play).size() > 0;
+        bool result = b.make_play(play);
 
 
         bool correct_score = b.get_score(is_player_1) == updated_score;
