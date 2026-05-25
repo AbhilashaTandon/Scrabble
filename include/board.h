@@ -30,7 +30,7 @@ class Board {
         Board(std::string wordlist_file_path, std::string trie_file_path,
               std::string ext_file_path);
 
-        std::set<struct Word> make_play(std::array<tile_place_t, 7>);
+        std::vector<struct Word> make_play(std::array<tile_place_t, 7>);
         void pass();
         bool exchange_letters(std::string letters_to_remove);
 
@@ -59,7 +59,7 @@ class Board {
         std::unordered_multiset<Tile> rack_b;
         std::uint16_t move_count;
         WordList wordlist;
-        std::set<struct Word> get_formed_words(
+        std::vector<struct Word> get_formed_words(
             std::array<tile_place_t, 7> play, bool is_vertical); // gets new words formed by move
 
         extension_map extensions;

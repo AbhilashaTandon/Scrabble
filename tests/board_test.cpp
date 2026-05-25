@@ -222,7 +222,7 @@ TEST(BoardTests, NewWords) {
         play[5] = std::make_pair(Tile::S, get_pos(10, 8));
         play[6] = std::make_pair(Tile::NONE, get_pos(11, 8));
 
-        std::set<struct Word> new_words = {
+        std::vector<struct Word> new_words = {
             Word("TORIES", get_pos(5, 8), false),
             Word("AT", get_pos(5, 7), true),
             Word("DO", get_pos(6, 7), true),
@@ -232,7 +232,7 @@ TEST(BoardTests, NewWords) {
         };
 
         b.set_rack("TORIES", false);
-        std::set<struct Word> formed_words = b.make_play(play);
+        std::vector<struct Word> formed_words = b.make_play(play);
 
         EXPECT_GT(formed_words.size(), 0);
 
@@ -263,7 +263,7 @@ TEST(BoardTests, NewWords2) {
         play[5] = std::make_pair(Tile::NONE, get_pos(10, 8));
         play[6] = std::make_pair(Tile::NONE, get_pos(11, 8));
 
-        std::set<struct Word> new_words = {
+        std::vector<struct Word> new_words = {
             Word("ETA", get_pos(5, 6), false),
             Word("ET", get_pos(5, 6), true),
             Word("TO", get_pos(6, 6), true),
@@ -271,7 +271,7 @@ TEST(BoardTests, NewWords2) {
         };
 
         b.set_rack("ETA", false);
-        std::set<struct Word> formed_words = b.make_play(play);
+        std::vector<struct Word> formed_words = b.make_play(play);
 
         EXPECT_GT(formed_words.size(), 0);
 

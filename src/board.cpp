@@ -108,10 +108,10 @@ struct Word Board::get_new_word(tile_place_t tile, bool is_vertical) {
         return Word("", 0, 0);
 }
 
-std::set<struct Word> Board::get_formed_words(std::array<tile_place_t, 7> play,
-                                              bool is_vertical) {
+std::vector<struct Word>
+Board::get_formed_words(std::array<tile_place_t, 7> play, bool is_vertical) {
 
-        std::set<struct Word> formed_words = std::set<struct Word>();
+        std::vector<struct Word> formed_words = std::vector<struct Word>();
 
         int first_tile = 0;
 
@@ -122,8 +122,12 @@ std::set<struct Word> Board::get_formed_words(std::array<tile_place_t, 7> play,
         struct Word main_word = get_new_word(play[first_tile], is_vertical);
 
         if (main_word.word.size() >= 2) {
-                formed_words.insert(main_word);
+                formed_words.push_back(main_word);
         }
+
+        struct Word a = Word("", 0, 0);
+        struct Word b = Word("", 0, 1);
+        assert(a != b);
 
         // extra words
 
@@ -135,9 +139,10 @@ std::set<struct Word> Board::get_formed_words(std::array<tile_place_t, 7> play,
                 struct Word extra_word = get_new_word(tile, !is_vertical);
 
                 if (extra_word.word.size() >= 2) {
-                        formed_words.insert(extra_word);
+                        formed_words.push_back(extra_word);
                 }
         }
+
 
         return formed_words;
 }
@@ -154,7 +159,7 @@ void Board::bonus_or_penalty(int point_diff, bool is_player_a) {
 
 score_t Board::get_score(bool player_a) { return player_a ? score_a : score_b; }
 
-std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
+std::vector<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
         // to be a valid scrabble move all letters must be in either one row or
         // column, and all words formed by these new letters must be valid
 
@@ -169,7 +174,7 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
 
         if (is_pass && move_count == 0) {
                 std::cerr << "Error: cannot pass on first move of game.\n";
-                return std::set<struct Word>();
+                return std::vector<struct Word>();
         } else if (is_pass && move_count > 0) {
                 pass();
                 return {Word("", PASS, false)};
@@ -194,7 +199,7 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
                                   << "," << int(coords.second) << "), tile "
                                   << char(board[p] + '@')
                                   << " is already present.\n";
-                        return std::set<struct Word>();
+                        return std::vector<struct Word>();
                 }
                 coords_t coords = get_xy(p);
                 min_x = min(min_x, coords.first);
@@ -207,7 +212,7 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
                         }
                         if (p == play[j].second) {
                                 std::cerr << "Overlapping tiles" << '\n';
-                                return std::set<struct Word>();
+                                return std::vector<struct Word>();
                         }
                 }
         }
@@ -218,7 +223,7 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
 
         if (!vertical && (min_y != max_y)) {
                 std::cerr << "Tiles not in one row or column" << '\n';
-                return std::set<struct Word>();
+                return std::vector<struct Word>();
         }
 
         for (int i = 0; i < 7; i++) { // add in tiles
@@ -235,27 +240,47 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
 
         if (vertical) {
                 for (int y = min_y; y <= max_y; y++) {
-                        if (board[get_pos(min_x, y)] == NONE) {
-                                std::cerr << "Gap in main vertical word at "
-                                          << min_x << " " << y << " " << '\n';
-                                return std::set<struct Word>();
-                                // if gap in main word played
+                        if (board[get_pos(min_x, y)] != NONE) {
+                                continue;
                         }
+
+                        std::cerr << "Gap in main vertical word at " << min_x
+                                  << " " << y << " " << '\n';
+                        for (int j = 0; j < 7;
+                             j++) { // remove tiles if invalid play
+                                if (play[j].first == NONE) {
+                                        continue;
+                                }
+                                position_t p = play[j].second;
+                                board[p] = Tile::NONE;
+                        }
+                        return std::vector<struct Word>();
+                        // if gap in main word played
                 }
         }
 
         else {
                 for (int x = min_x; x <= max_x; x++) {
-                        if (board[get_pos(x, min_y)] == NONE) {
-                                std::cerr << "Gap in main horizontal word at "
-                                          << x << " " << min_y << " " << '\n';
-                                return std::set<struct Word>();
-                                // if gap in main word played
+                        if (board[get_pos(x, min_y)] != NONE) {
+                                continue;
                         }
+
+                        std::cerr << "Gap in main horizontal word at " << x
+                                  << " " << min_y << " " << '\n';
+                        for (int j = 0; j < 7;
+                             j++) { // remove tiles if invalid play
+                                if (play[j].first == NONE) {
+                                        continue;
+                                }
+                                position_t p = play[j].second;
+                                board[p] = Tile::NONE;
+                        }
+                        return std::vector<struct Word>();
+                        // if gap in main word played
                 }
         }
 
-        std::set<struct Word> new_words = get_formed_words(play, vertical);
+        std::vector<struct Word> new_words = get_formed_words(play, vertical);
 
         // temporarily disable invalid word detection for testing
         //  for (struct Word new_word : new_words) {
@@ -272,7 +297,7 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
         //                  position_t p = play[j].second;
         //                  board[p] = Tile::NONE;
         //          }
-        //          return std::set<struct Word>();
+        //          return std::vector<struct Word>();
         //  }
 
         std::string letters_played = "";
@@ -285,17 +310,33 @@ std::set<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
         }
 
         if (!remove_tiles_from_rack(letters_played)) {
-
-                return std::set<struct Word>();
+                // player used tile not found in rack
+                for (int j = 0; j < 7; j++) { // remove tiles if invalid play
+                        if (play[j].first == NONE) {
+                                continue;
+                        }
+                        position_t p = play[j].second;
+                        board[p] = Tile::NONE;
+                }
+                return std::vector<struct Word>();
         }
 
         for (struct Word new_word : new_words) {
                 score_t score = add_score(new_word);
-                std::cout << new_word.word << ' ' << score << '\n';
                 if (move_count % 2 == 0) {
                         score_a += score;
                 } else {
                         score_b += score;
+                }
+        }
+
+        if (new_words.size() == 0) {
+                for (int j = 0; j < 7; j++) { // remove tiles if invalid play
+                        if (play[j].first == NONE) {
+                                continue;
+                        }
+                        position_t p = play[j].second;
+                        board[p] = Tile::NONE;
                 }
         }
 
@@ -338,7 +379,6 @@ void Board::print() const {
         std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
 
         // print rack for player A
-        // std::cout << "^[[2J"; // clears screen
         std::cout << '\n';
         for (int i = 0; i < 23; i++) {
                 std::cout << " ";
