@@ -1,7 +1,7 @@
 #include "../include/board.h"
 #include "../include/helper.h"
 #include "../include/print.h"
-#include "../include/wordlist.h"
+#include "../include/trie.h"
 #include <cassert>
 #include <cctype>
 #include <codecvt>
@@ -18,9 +18,8 @@
 #define min(x, y) ((x) < (y)) ? (x) : (y)
 #define max(x, y) ((x) > (y)) ? (x) : (y)
 
-Board::Board(std::string wordlist_file_path, std::string trie_file_path,
-             std::string ext_file_path)
-    : wordlist(wordlist_file_path, trie_file_path) {
+Board::Board(std::string trie_file_path, std::string ext_file_path)
+    : wordlist(trie_file_path) {
 
         for (int i = 0; i < 30; i++) {
                 tilecount_t count = tile_freq[i];
@@ -46,7 +45,6 @@ Board::Board(std::string wordlist_file_path, std::string trie_file_path,
         move_count = 0;
 }
 
-
 void Board::reset() {
         score_a = 0;
         score_b = 0;
@@ -59,7 +57,7 @@ void Board::reset() {
         std::fill(board.begin(), board.end(), Tile::NONE);
 }
 
-bool Board::contains(std::string word) const { return wordlist.contains(word); }
+bool Board::contains(std::string word) { return wordlist.contains(word); }
 
 struct Word Board::get_new_word(tile_place_t tile, bool is_vertical) {
         position_t p = tile.second;
@@ -155,7 +153,6 @@ Board::get_formed_words(std::array<tile_place_t, 7> play, bool is_vertical) {
                         formed_words.push_back(extra_word);
                 }
         }
-
 
         return formed_words;
 }

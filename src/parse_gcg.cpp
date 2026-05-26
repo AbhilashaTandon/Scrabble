@@ -7,7 +7,7 @@
 #include <string>
 
 GCGParser::GCGParser(std::string file_path)
-    : b(wordlist_file, trie_file, extensions_file), file_path(file_path) {
+    : b(trie_file, extensions_file), file_path(file_path) {
         player1 = "player1";
         player2 = "player2";
 }

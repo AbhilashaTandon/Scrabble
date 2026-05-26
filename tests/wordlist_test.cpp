@@ -1,11 +1,11 @@
 
-#include "../include/wordlist.h"
 #include "../include/board.h"
 #include "../include/parse_cli_args.h"
+#include "../include/trie.h"
 #include <gtest/gtest.h>
 
 TEST(WordlistTests, WordTests) {
-        WordList w = WordList(wordlist_file, trie_file);
+        Trie w = Trie(trie_file);
         ASSERT_TRUE(w.contains("AA"));
         ASSERT_TRUE(w.contains("AB"));
         ASSERT_TRUE(w.contains("CAKE"));
@@ -15,7 +15,7 @@ TEST(WordlistTests, WordTests) {
 }
 
 TEST(WordlistTests, BoardTests) {
-        Board b = Board(wordlist_file, trie_file, extensions_file);
+        Board b = Board(trie_file, extensions_file);
         ASSERT_TRUE(b.contains("AA"));
         ASSERT_TRUE(b.contains("AB"));
         ASSERT_TRUE(b.contains("CAKE"));

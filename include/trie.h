@@ -4,11 +4,11 @@
 #include "helper.h"
 #include <array>
 #include <cstdint>
-#include <vector>
-#include <string>
 #include <span>
+#include <string>
+#include <vector>
 
-struct TrieNode{
+struct TrieNode {
         int wordlist_idx;
         int num_words;
         struct TrieNode *left;
@@ -19,15 +19,20 @@ struct TrieNode{
 };
 
 class Trie {
-public:
+      public:
         Trie(std::string file_path);
         std::span<std::string> get_words(std::vector<Tile> available);
-private:
+
+        bool contains(std::string);
+        uint32_t size();
+
+      private:
         struct TrieNode root;
-        std::vector<std::string> wordlist; //holds all words so nodes can index them
+        std::vector<std::string>
+            wordlist; // holds all words so nodes can index them
         std::vector<std::string> parse_trie_file(std::string file_path);
 };
 
-void print(struct TrieNode*);
+void print(struct TrieNode *);
 
 #endif

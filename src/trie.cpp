@@ -26,7 +26,8 @@ Trie::Trie(std::string file_path) {
         wordlist = parse_trie_file(file_path);
 
         std::cout << "All words loaded" << "\n";
-        std::queue<struct TrieNode *> ancestors = std::queue<struct TrieNode *>();
+        std::queue<struct TrieNode *> ancestors =
+            std::queue<struct TrieNode *>();
         ancestors.push(&this->root);
 
         while (!ancestors.empty()) {
@@ -125,16 +126,18 @@ std::vector<std::string> Trie::parse_trie_file(std::string file_path) {
 
                         if (isupper(c)) {
                                 if (current->left == NULL) {
-                                        struct TrieNode *child = new struct TrieNode(
-                                            0, 0, NULL, NULL, NONE);
+                                        struct TrieNode *child =
+                                            new struct TrieNode(0, 0, NULL,
+                                                                NULL, NONE);
                                         current->left = child;
                                         // num_nodes++;
                                 }
                                 current = current->left;
                         } else {
                                 if (current->right == NULL) {
-                                        struct TrieNode *child = new struct TrieNode(
-                                            0, 0, NULL, NULL, NONE);
+                                        struct TrieNode *child =
+                                            new struct TrieNode(0, 0, NULL,
+                                                                NULL, NONE);
                                         current->right = child;
                                         // num_nodes++;
                                 }
@@ -153,3 +156,20 @@ std::vector<std::string> Trie::parse_trie_file(std::string file_path) {
 
         return wordlist;
 }
+
+bool Trie::contains(std::string word) {
+        std::vector<Tile> tiles{};
+        for (char c : word) {
+                tiles.push_back(make_tile(c));
+        }
+
+        std::span<std::string> lookup = get_words(tiles);
+
+        for (std::string lookup_word : lookup) {
+                if (lookup_word == word) {
+                        return true;
+                }
+        }
+        return false;
+}
+uint32_t Trie::size() { return wordlist.size(); }

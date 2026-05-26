@@ -2,7 +2,7 @@
 #define BOARD_H
 #include "extensions.h"
 #include "helper.h"
-#include "wordlist.h"
+#include "trie.h"
 #include <array>
 #include <cstdint>
 #include <unordered_set>
@@ -27,8 +27,7 @@ struct Word {
 
 class Board {
       public:
-        Board(std::string wordlist_file_path, std::string trie_file_path,
-              std::string ext_file_path);
+        Board(std::string trie_file_path, std::string ext_file_path);
 
         std::vector<struct Word> make_play(std::array<tile_place_t, 7>);
         void pass();
@@ -37,7 +36,7 @@ class Board {
         // these cant be struct Words because its legal to play non-adjacent
         // tiles if there are existing tiles between them that form a word
         void print() const;
-        bool contains(std::string word) const;
+        bool contains(std::string word);
         void end_game();
 
         void bonus_or_penalty(int point_diff, bool is_player_a);
@@ -63,7 +62,7 @@ class Board {
         std::unordered_multiset<Tile> rack_a;
         std::unordered_multiset<Tile> rack_b;
         std::uint16_t move_count;
-        WordList wordlist;
+        Trie wordlist;
         std::vector<struct Word>
         get_formed_words(std::array<tile_place_t, 7> play,
                          bool is_vertical); // gets new words formed by move

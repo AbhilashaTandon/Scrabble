@@ -21,7 +21,6 @@ SOURCES
         src/board.cpp
         src/extensions.cpp
         src/helper.cpp
-        src/wordlist.cpp
         src/trie.cpp
         src/parse_gcg.cpp
         src/parse_cli_args.cpp
@@ -32,7 +31,6 @@ SOURCES
         include/bot.h
         include/helper.h
         include/print.h
-        include/wordlist.h
         include/parse_gcg.h
         include/parse_cli_args.h
         include/bot.h

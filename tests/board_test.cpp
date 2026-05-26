@@ -7,7 +7,7 @@
 #include <gtest/gtest.h>
 #include <utility>
 
-Board b = Board(wordlist_file, trie_file, extensions_file);
+Board b = Board(trie_file, extensions_file);
 
 TEST(BoardTests, CLI_args) {
         ASSERT_TRUE(wordlist_file != "");
