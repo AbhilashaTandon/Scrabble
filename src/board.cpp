@@ -46,6 +46,19 @@ Board::Board(std::string wordlist_file_path, std::string trie_file_path,
         move_count = 0;
 }
 
+
+void Board::reset() {
+        score_a = 0;
+        score_b = 0;
+        move_count = 0;
+
+        bag.clear();
+        rack_a.clear();
+        rack_b.clear();
+        std::fill(bonus_used.begin(), bonus_used.end(), 0);
+        std::fill(board.begin(), board.end(), Tile::NONE);
+}
+
 bool Board::contains(std::string word) const { return wordlist.contains(word); }
 
 struct Word Board::get_new_word(tile_place_t tile, bool is_vertical) {

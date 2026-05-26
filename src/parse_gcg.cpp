@@ -12,9 +12,17 @@ GCGParser::GCGParser(std::string file_path)
         player2 = "player2";
 }
 
+void GCGParser::reset(std::string file_path) {
+        b.reset();
+        this->file_path = file_path;
+        player1 = "player1";
+        player2 = "player2";
+}
+
 bool GCGParser::validate_game(bool verbose) {
 
-        std::fstream file = std::fstream((games_dir + "/" + file_path).c_str(), std::ios_base::in);
+        std::fstream file = std::fstream((games_dir + "/" + file_path).c_str(),
+                                         std::ios_base::in);
         // read in file
 
         std::string line;
@@ -252,8 +260,7 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
                 }
         }
 
-        bool result = b.make_play(play);
-
+        bool result = b.make_play(play).size() > 0;
 
         bool correct_score = b.get_score(is_player_1) == updated_score;
 

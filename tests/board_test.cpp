@@ -7,7 +7,9 @@
 #include <gtest/gtest.h>
 #include <utility>
 
-TEST(BoardTests, CLI_args){
+Board b = Board(wordlist_file, trie_file, extensions_file);
+
+TEST(BoardTests, CLI_args) {
         ASSERT_TRUE(wordlist_file != "");
         ASSERT_TRUE(trie_file != "");
         ASSERT_TRUE(extensions_file != "");
@@ -24,7 +26,7 @@ TEST(BoardTests, HorizontalWord) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board(wordlist_file, trie_file, extensions_file);
+        b.reset();
         b.set_rack("ACADEMY", true);
         EXPECT_TRUE(b.make_play(play).size() > 0);
 
@@ -36,7 +38,7 @@ TEST(BoardTests, HorizontalWord) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        b = Board(wordlist_file, trie_file, extensions_file);
+        b.reset();
         b.set_rack("KFJALSD", true);
         EXPECT_FALSE(b.make_play(play).size() > 0);
 }
@@ -51,13 +53,13 @@ TEST(BoardTests, Gap) {
         play[5] = std::make_pair(Tile::A, get_pos(8, 7));
         play[6] = std::make_pair(Tile::N, get_pos(9, 7));
 
-        Board b = Board(wordlist_file, trie_file, extensions_file);
+        b.reset();
         b.set_rack("EBBMAN", true);
         EXPECT_FALSE(b.make_play(play).size() > 0);
 }
 
 TEST(BoardTests, Overlap) {
-        Board b = Board(wordlist_file, trie_file, extensions_file);
+        b.reset();
         std::array<tile_place_t, 7> play;
 
         play[0] = std::make_pair(Tile::A, get_pos(14, 4));
@@ -73,7 +75,7 @@ TEST(BoardTests, Overlap) {
 }
 
 TEST(BoardTests, Vertical) {
-        Board b = Board(wordlist_file, trie_file, extensions_file);
+        b.reset();
         std::array<tile_place_t, 7> play;
 
         play[0] = std::make_pair(Tile::A, get_pos(14, 4));
@@ -89,7 +91,7 @@ TEST(BoardTests, Vertical) {
 }
 
 TEST(BoardTests, Separated) {
-        Board b = Board(wordlist_file, trie_file, extensions_file);
+        b.reset();
         std::array<tile_place_t, 7> play;
 
         play[0] = std::make_pair(Tile::A, get_pos(0, 0));
@@ -114,7 +116,7 @@ TEST(BoardTests, CrissCross) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board(wordlist_file, trie_file, extensions_file);
+        b.reset();
         b.set_rack("ACADEMY", true);
         EXPECT_TRUE(b.make_play(play).size() > 0);
 
@@ -141,7 +143,7 @@ TEST(BoardTests, AddOneTile) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board(wordlist_file, trie_file, extensions_file);
+        b.reset();
         b.set_rack("ACADEMY", true);
         EXPECT_TRUE(b.make_play(play).size() > 0);
 
@@ -168,7 +170,7 @@ TEST(BoardTests, FirstMovePass) {
         play[5] = std::make_pair(Tile::NONE, get_pos(8, 7));
         play[6] = std::make_pair(Tile::NONE, get_pos(9, 7));
 
-        Board b = Board(wordlist_file, trie_file, extensions_file);
+        b.reset();
         EXPECT_FALSE(b.make_play(play).size() > 0);
 }
 
@@ -183,7 +185,7 @@ TEST(BoardTests, SecondMovePass) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board(wordlist_file, trie_file, extensions_file);
+        b.reset();
         b.set_rack("ACADEMY", true);
         EXPECT_TRUE(b.make_play(play).size() > 0);
 
@@ -209,7 +211,7 @@ TEST(BoardTests, NewWords) {
         play[5] = std::make_pair(Tile::M, get_pos(8, 7));
         play[6] = std::make_pair(Tile::Y, get_pos(9, 7));
 
-        Board b = Board(wordlist_file, trie_file, extensions_file);
+        b.reset();
 
         b.set_rack("ACADEMY", true);
         EXPECT_TRUE(b.make_play(play).size() > 0);
@@ -250,7 +252,7 @@ TEST(BoardTests, NewWords2) {
         play[5] = std::make_pair(Tile::S, get_pos(8, 7));
         play[6] = std::make_pair(Tile::NONE, get_pos(9, 7));
 
-        Board b = Board(wordlist_file, trie_file, extensions_file);
+        b.reset();
 
         b.set_rack("ACTORS", true);
         EXPECT_TRUE(b.make_play(play).size() > 0);
@@ -279,8 +281,10 @@ TEST(BoardTests, NewWords2) {
 }
 
 TEST(BoardTests, StressTest) {
-        for (const auto &entry : std::filesystem::directory_iterator(games_dir)) {
-                GCGParser parser(entry.path());
+        GCGParser parser("");
+        for (const auto &entry :
+             std::filesystem::directory_iterator(games_dir)) {
+                parser.reset(entry.path());
                 bool game_result = parser.validate_game(false);
                 if (!game_result) {
                         std::cout << entry.path() << std::endl;

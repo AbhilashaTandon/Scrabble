@@ -50,6 +50,8 @@ class Board {
 
         struct Word get_new_word(tile_place_t tile, bool is_vertical);
 
+        void reset();
+
       protected:
         extension_map extensions;
 
@@ -57,7 +59,7 @@ class Board {
         score_t score_a;
         score_t score_b;
         std::vector<Tile> bag;
-        Tile board[225];
+        std::array<Tile, 225> board;
         std::unordered_multiset<Tile> rack_a;
         std::unordered_multiset<Tile> rack_b;
         std::uint16_t move_count;
