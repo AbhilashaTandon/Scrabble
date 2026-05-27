@@ -47,47 +47,45 @@ Trie::Trie(std::string file_path) {
         }
 }
 
-std::span<std::string> Trie::get_words(std::vector<Tile> available) {
-        struct TrieNode *current = &this->root;
+std::vector<std::string> Trie::get_words(std::vector<Tile> available) const {
+        struct TrieNode current = this->root;
         while (true) {
-                if (current->letter == NONE) {
-                        return std::span(wordlist.data() +
-                                             current->wordlist_idx + 1,
-                                         current->num_words);
+                if (current.letter == NONE) {
+                        break;
                 }
                 bool present = false;
                 for (std::vector<Tile>::iterator i = available.begin();
                      i < available.end(); i++) {
-                        if (*i == current->letter) {
+                        if (*i == current.letter) {
                                 present = true;
                                 available.erase(i);
                                 break;
                         }
                 }
-                std::cout << (present ? char(current->letter + 64)
-                                      : char(current->letter + 96));
                 if (present) {
-                        if (current->left == NULL) {
-                                return std::span(wordlist.data() +
-                                                     current->wordlist_idx + 1,
-                                                 current->num_words);
+                        if (current.left == NULL) {
+                                break;
                         }
-                        // std::cout << char(current->letter + 64);
-                        current = current->left;
+                        current = *current.left;
                         continue;
                 }
 
                 else {
-                        if (current->right == NULL) {
-                                return std::span(wordlist.data() +
-                                                     current->wordlist_idx + 1,
-                                                 current->num_words);
+                        if (current.right == NULL) {
+                                break;
                         }
-                        // std::cout << char(current->letter + 96);
-                        current = current->right;
+                        current = *current.right;
                         continue;
                 }
         }
+        std::vector<std::string> words_found{};
+        for (auto itr = wordlist.data() + current.wordlist_idx + 1;
+             itr <
+             wordlist.data() + current.wordlist_idx + 1 + current.num_words;
+             itr++) {
+                words_found.push_back(*itr);
+        }
+        return words_found;
 }
 
 std::vector<std::string> Trie::parse_trie_file(std::string file_path) {
@@ -157,13 +155,13 @@ std::vector<std::string> Trie::parse_trie_file(std::string file_path) {
         return wordlist;
 }
 
-bool Trie::contains(std::string word) {
+bool Trie::contains(std::string word) const {
         std::vector<Tile> tiles{};
         for (char c : word) {
                 tiles.push_back(make_tile(c));
         }
 
-        std::span<std::string> lookup = get_words(tiles);
+        std::vector<std::string> lookup = get_words(tiles);
 
         for (std::string lookup_word : lookup) {
                 if (lookup_word == word) {

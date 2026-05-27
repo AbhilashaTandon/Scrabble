@@ -36,18 +36,18 @@ class Board {
         // these cant be struct Words because its legal to play non-adjacent
         // tiles if there are existing tiles between them that form a word
         void print() const;
-        bool contains(std::string word);
+        bool contains(std::string word) const;
         void end_game();
 
         void bonus_or_penalty(int point_diff, bool is_player_a);
 
-        score_t get_score(bool player_a);
+        score_t get_score(bool player_a) const;
 
         void set_rack(std::string new_rack, bool is_player_a);
 
         char get_letter(uint8_t x, uint8_t y) const;
 
-        struct Word get_new_word(tile_place_t tile, bool is_vertical);
+        struct Word get_new_word(tile_place_t tile, bool is_vertical) const;
 
         void reset();
 
@@ -65,7 +65,7 @@ class Board {
         Trie wordlist;
         std::vector<struct Word>
         get_formed_words(std::array<tile_place_t, 7> play,
-                         bool is_vertical); // gets new words formed by move
+                         bool is_vertical) const; // gets new words formed by move
 
         std::unordered_multiset<Tile> draw_tiles(tilecount_t num_tiles);
 

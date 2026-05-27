@@ -21,9 +21,9 @@ struct TrieNode {
 class Trie {
       public:
         Trie(std::string file_path);
-        std::span<std::string> get_words(std::vector<Tile> available);
+        std::vector<std::string> get_words(std::vector<Tile> available) const;
 
-        bool contains(std::string);
+        bool contains(std::string) const;
         uint32_t size();
 
       private:
