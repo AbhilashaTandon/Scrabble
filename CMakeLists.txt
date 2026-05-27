@@ -22,12 +22,14 @@ SOURCES
         src/extensions.cpp
         src/helper.cpp
         src/trie.cpp
+        src/dawg.cpp
         src/parse_gcg.cpp
         src/parse_cli_args.cpp
         src/bot.cpp
         include/board.h
         include/extensions.h
         include/trie.h
+        include/dawg.h
         include/bot.h
         include/helper.h
         include/print.h

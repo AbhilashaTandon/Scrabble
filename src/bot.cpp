@@ -113,7 +113,7 @@ bool Bot::make_play(std::array<tile_place_t, 7> play) {
 
 Bot::Bot(std::string wordlist_file_path, std::string trie_file_path,
          std::string ext_file_path)
-    : Board(wordlist_file_path, trie_file_path, ext_file_path) {
+    : Board( trie_file_path, ext_file_path) {
         for (int i = 0; i < 225; i++) {
                 horiz_move_opts.push_back(0xFFFFFFFF);
                 vert_move_opts.push_back(0xFFFFFFFF);

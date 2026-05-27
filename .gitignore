@@ -9,3 +9,6 @@ TODO.md
 profile.txt
 profile2.txt
 callgrind.*
+log.txt
+d*.txt
+trie.txt
