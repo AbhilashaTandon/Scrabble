@@ -5,7 +5,6 @@
 #include <fstream>
 #include <iostream>
 #include <queue>
-#include <span>
 #include <sstream>
 #include <string>
 

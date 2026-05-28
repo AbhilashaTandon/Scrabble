@@ -19,6 +19,7 @@ int main(int argc, char **argv) {
         }
         Dawg d = Dawg();
         d.build_dawg();
+        d.print();
         // d.print();
         // setlocale(LC_ALL, "en_US.UTF-8");
         // for (const auto &entry : std::filesystem::directory_iterator(games_dir)) {

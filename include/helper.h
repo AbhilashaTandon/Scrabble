@@ -161,4 +161,6 @@ uint32_t get_bitmask(std::vector<Tile> tiles);
 
 const position_t PASS = 225;
 
+
 #endif
+
