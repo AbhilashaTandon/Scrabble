@@ -19,7 +19,7 @@
 #define max(x, y) ((x) > (y)) ? (x) : (y)
 
 Board::Board(std::string trie_file_path, std::string ext_file_path)
-    : wordlist(trie_file_path) {
+    : wordlist() {
 
         for (int i = 0; i < 30; i++) {
                 tilecount_t count = tile_freq[i];

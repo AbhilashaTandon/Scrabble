@@ -1,6 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 #include "extensions.h"
+#include "dawg.h"
 #include "helper.h"
 #include "trie.h"
 #include <array>
@@ -62,7 +63,7 @@ class Board {
         std::unordered_multiset<Tile> rack_a;
         std::unordered_multiset<Tile> rack_b;
         std::uint16_t move_count;
-        Trie wordlist;
+        Dawg wordlist;
         std::vector<struct Word>
         get_formed_words(std::array<tile_place_t, 7> play,
                          bool is_vertical) const; // gets new words formed by move

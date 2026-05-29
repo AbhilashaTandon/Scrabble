@@ -1,44 +1,16 @@
-AA rough, cindery lava [n AAS]
-AAH to exclaim in amazement, joy, or surprise [v AAHED, AAHING, AAHS]
-AAHED <aah=v> [v]
-AAHING <aah=v> [v]
-AAHS <aah=v> [v]
-AAL an East Indian shrub [n AALS]
-AALII a tropical tree [n AALIIS]
-AALIIS <aalii=n> [n]
-AALS <aal=n> [n]
-AARDVARK an African mammal of species Orycteropus afer* [n AARDVARKS]
-AARDVARKS <aardvark=n> [n]
-AARDWOLF an African mammal of species Proteles cristata* [n AARDWOLVES]
-AARDWOLVES <aardwolf=n> [n]
-AARGH used to express disgust [interj]
-AARRGH {aargh=interj} [interj]
-AARRGHH {aargh=interj} [interj]
-AAS <aa=n> [n]
-AASVOGEL a South African vulture [n AASVOGELS]
-AASVOGELS <aasvogel=n> [n]
-AB a muscle in the abdomen [n ABS]
-ABA a sleeveless garment worn by Arabs [n ABAS]
-ABACA a Philippine plant [n ABACAS]
-ABACAS <abaca=n> [n]
-ABACI <abacus=n> [n]
-ABACK toward the back [adv]
-ABACTERIAL not caused by bacteria [adj]
-ABACUS a calculating device [n ABACI, ABACUSES]
-ABACUSES <abacus=n> [n]
-ABAFT toward the stern [adv]
-ABAKA {abaca=n} [n ABAKAS]
-ABAKAS <abaka=n> [n]
-ABALONE an edible shellfish of genus Haliotis [n ABALONES]
-ABALONES <abalone=n> [n]
-ABAMP {abampere=n} [n ABAMPS]
-ABAMPERE ten amperes [n ABAMPERES]
-ABAMPERES <abampere=n> [n]
-ABAMPS <abamp=n> [n]
-ABANDON to leave or give up completely [v ABANDONED, ABANDONING, ABANDONS] : ABANDONMENT [n]
-ABANDONED <abandon=v> [v]
-ABANDONER one who {abandons=v} [n ABANDONERS]
-ABANDONERS <abandoner=n> [n]
-ABANDONING <abandon=v> [v]
-ABANDONMENT the act of {abandoning=v} [n ABANDONMENTS]
-ABANDONMENTS <abandonment=n> [n]
+BIKE
+CAD
+CAKE
+DAD
+LAKE
+LAM
+MAKE
+MALE
+NAIL
+OPENING
+PEN
+PENS
+PIG
+QUESTIONING
+RESTAURANT
+ZEPHYR
