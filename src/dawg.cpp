@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 
 bool find_in_vector(std::vector<DawgNode *> &vec, DawgNode *item) {
@@ -20,8 +21,11 @@ bool remove_from_vector(std::vector<DawgNode *> &vec, DawgNode *item) {
 }
 
 Dawg::Dawg() {
+        assert(wordlist_file != "");
         start = new DawgNode('<');
         end = new DawgNode('>');
+        num_nodes = 2;
+        build_dawg();
 }
 
 bool Dawg::has_children(DawgNode *d) const {
@@ -31,7 +35,7 @@ bool Dawg::has_children(DawgNode *d) const {
         if (d->children.size() > 1) {
                 return true;
         }
-        return d->children[0] != end;
+        return !d->children.contains(end->c);
 }
 
 void Dawg::build_dawg() {
@@ -47,45 +51,34 @@ void Dawg::build_dawg() {
                         continue;
                 }
                 insert_word(word);
-                if (end->parents.size() > 26) {
-                        std::cout << word << '\n';
-                        return;
-                }
                 assert(start->parents.size() == 0);
                 assert(end->children.size() == 0);
         }
+        assert(has_children(start));
         replace_or_register(start);
 }
 
 std::pair<DawgNode *, size_t> Dawg::find_common_prefix(std::string word) const {
         DawgNode *current = start;
         for (size_t i = 0; i < word.size(); i++) {
-                bool child_found = false;
-                for (DawgNode *child : current->children) {
-                        if (child->c == word[i]) {
-                                child_found = true;
-                                current = child;
-                                break;
-                        }
-                }
-
-                // child not found
-                if (!child_found) {
-                        assert(current != nullptr);
+                // std::cout << "\t" << word[i] << " " << i << "\n";
+                auto itr = current->children.find(word[i]);
+                if (itr == current->children.end()) {
                         return std::make_pair(current, i);
                 }
+                current = itr->second;
         }
 
-        assert(current != end);
-        assert(current != nullptr);
-        if (!find_in_vector(current->children, end)) {
-                assert(!find_in_vector(end->parents, current));
-                current->children.push_back(end);
-                end->parents.push_back(current);
-                return std::make_pair(end, word.size());
-        } else {
+        if (!current->children.contains(end->c)) {
                 return std::make_pair(current, word.size());
         }
+
+        return std::make_pair(end, word.size() + 1);
+}
+
+bool Dawg::contains(std::string word) const {
+        auto [last_state, idx] = find_common_prefix(word);
+        return last_state == end;
 }
 
 void Dawg::add_suffix(DawgNode *last_state, std::string word, size_t index) {
@@ -94,18 +87,29 @@ void Dawg::add_suffix(DawgNode *last_state, std::string word, size_t index) {
         }
         assert(last_state != nullptr);
         DawgNode *current = last_state;
+
         for (size_t i = index; i < word.size(); i++) {
                 assert(current != end);
                 assert(end->c == '>');
                 DawgNode *new_node = new DawgNode(word[i]);
+                num_nodes++;
                 assert(end->c == '>');
                 assert(new_node != end);
-                current->children.push_back(new_node);
+                assert(!current->children.contains(word[i]));
+                current->children[word[i]] = new_node;
                 new_node->parents.push_back(current);
+                // std::cout << "\tJust added: " << current-> c << " " <<
+                // new_node->c << " " << i << '\n';
                 current = new_node;
+                assert(!current->children.contains(end->c));
         }
-        assert(current != end);
-        current->children.push_back(end);
+
+        assert(current->c == word[word.size() - 1]);
+
+        assert(!current->children.contains(end->c));
+        current->children[end->c] = end;
+
+        // std::cout << current->c << '\n';
         end->parents.push_back(current);
 }
 
@@ -124,44 +128,62 @@ void Dawg::replace_or_register(DawgNode *d) {
         assert(d != nullptr);
         assert(d != end);
         assert(has_children(d));
-        DawgNode *last_child = d->children.front();
-        char last_letter = last_child->c;
-        for (DawgNode *child : d->children) {
-                if (child->c > last_letter) {
-                        last_child = child;
-                        last_letter = child->c;
+        DawgNode *last_child = nullptr;
+        char last_letter = 0;
+        for (char letter = 'Z'; letter >= 'A'; letter--) {
+                if (d->children.contains(letter)) {
+                        last_child = d->children[letter];
+                        last_letter = letter;
+                        break;
                 }
         }
+
         assert(last_child != nullptr);
+        assert(last_letter == last_child->c);
 
         if (has_children(last_child)) {
                 replace_or_register(last_child);
         }
 
-        for (DawgNode *saved : reg) {
-                assert(saved != nullptr);
-                if (*saved != *last_child) {
-                        continue;
-                }
+        auto itr = reg.find(last_child);
 
-                remove_from_vector(d->children, last_child);
-                d->children.push_back(saved);
+        if (itr != reg.end()) {
+                DawgNode *saved = *itr;
+                assert(saved != nullptr);
+                assert(*saved == *last_child);
+
+                d->children[last_letter] = saved;
+
+                assert(saved != end);
+
                 saved->parents.push_back(d);
                 // replace last child with saved
 
-                for (DawgNode *child : last_child->children) {
-                        assert(find_in_vector(saved->children, child));
-                        // must share same children
+                for (char letter = 'A'; letter <= 'Z'; letter++) {
+                        if (!last_child->children.contains(letter)) {
+                                continue;
+                        }
+
+                        DawgNode *child = last_child->children[letter];
+
                         assert(find_in_vector(child->parents, saved));
                         assert(find_in_vector(child->parents, last_child));
                         remove_from_vector(child->parents, last_child);
                 }
+
+                for (DawgNode *parent : last_child->parents) {
+                        assert(parent->children.contains(last_child->c));
+                        assert(parent->children[last_child->c] = last_child);
+                        parent->children[last_child->c] = saved;
+                }
+
                 assert(last_child != end);
+                num_nodes--;
                 delete last_child;
                 return;
         }
 
-        reg.push_back(last_child);
+        reg.insert(last_child);
 }
 
 void Dawg::print(DawgNode *current, std::string indent, bool is_last,
@@ -198,8 +220,13 @@ void Dawg::print(DawgNode *current, std::string indent, bool is_last,
                 size_t num_children = current->children.size();
                 size_t i = 0;
 
-                for (DawgNode *d : current->children) {
-                        print(d, indent, i == num_children - 1, backwards);
+                for (char letter = 'A'; letter <= 'Z'; letter++) {
+                        if (!current->children.contains(letter)) {
+                                continue;
+                        }
+
+                        print(current->children[letter], indent,
+                              i == num_children - 1, backwards);
                         i++;
                 }
         }
@@ -208,4 +235,79 @@ void Dawg::print(DawgNode *current, std::string indent, bool is_last,
 void Dawg::print() const {
         print(start, "", false, false);
         print(end, "", false, true);
+}
+
+std::vector<std::string>
+Dawg::get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
+                           DawgNode *node, std::string word_path,
+                           std::vector<std::string> &words,  int max_depth) const {
+
+        if (node->children.contains(end->c)) {
+                words.push_back(word_path);
+        }
+
+
+        if(word_path.size() == max_depth){
+                return words;
+        }
+
+        if (rack.empty()) {
+                return words;
+        }
+
+        for (auto rack_itr = rack.begin(); rack_itr != rack.end(); rack_itr++) {
+
+                if (rack_itr->second) {
+                        // if we've used it already
+                        continue;
+                }
+
+                if (rack_itr->first == Tile::BLANK) {
+                        // blank can be any letter
+
+                        for (auto itr = node->children.begin();
+                             itr != node->children.end(); itr++) {
+                                (*rack_itr).second = true;
+                                // mark tile as used
+                                std::vector<std::string> new_words =
+                                    get_words_from_tiles(
+                                        rack, itr->second,
+                                        word_path +
+                                            char(itr->first +
+                                                 32), // make it lowercase to
+                                                      // distinguish blanks
+                                        words,  max_depth);
+                                (*rack_itr).second = false;
+                        }
+
+
+                }
+
+                char c = char(rack_itr->first + 64);
+                if (!node->children.contains(c)) {
+                        // if no words exist with word path prefix and the given
+                        // tile
+                        continue;
+                }
+
+                (*rack_itr).second = true;
+                // mark tile as used
+                std::vector<std::string> new_words = get_words_from_tiles(
+                    rack, node->children[c], word_path + c, words,  max_depth);
+                (*rack_itr).second = false;
+        }
+
+        return words;
+}
+
+std::vector<std::string>
+Dawg::get_words_from_tiles(std::unordered_multiset<Tile> &rack, int max_depth) const {
+        std::vector<std::string> words{};
+        std::unordered_multimap<Tile, bool> used_tiles{};
+        // we use a map here to keep track of what tiles we've used so we don't
+        // have to modify the rack parameter
+        for (Tile t : rack) {
+                used_tiles.insert(std::pair(t, false));
+        }
+        return get_words_from_tiles(used_tiles, start, "", words, max_depth);
 }
