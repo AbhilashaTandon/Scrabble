@@ -64,9 +64,10 @@ class Board {
         std::unordered_multiset<Tile> rack_b;
         std::uint16_t move_count;
         Dawg wordlist;
-        std::vector<struct Word>
-        get_formed_words(std::array<tile_place_t, 7> play,
-                         bool is_vertical) const; // gets new words formed by move
+        std::string wordlist_file_path;
+        std::vector<struct Word> get_formed_words(
+            std::array<tile_place_t, 7> play,
+            bool is_vertical) const; // gets new words formed by move
 
         std::unordered_multiset<Tile> draw_tiles(tilecount_t num_tiles);
 

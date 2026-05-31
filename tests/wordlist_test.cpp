@@ -1,19 +1,14 @@
 
+#include "../include/dawg.h"
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include "../include/board.h"
 #include "../include/dawg.h"
 #include "../include/parse_cli_args.h"
-#include "../include/trie.h"
 #include <gtest/gtest.h>
 
-TEST(WordlistTests, WordTests) {
-        Trie w = Trie(trie_file);
-        ASSERT_TRUE(w.contains("AA"));
-        ASSERT_TRUE(w.contains("AB"));
-        ASSERT_TRUE(w.contains("CAKE"));
-        ASSERT_TRUE(w.contains("ZEPHYR"));
-        ASSERT_FALSE(w.contains("BB"));
-        ASSERT_FALSE(w.contains("JKDKFDKFD"));
-}
 
 TEST(WordlistTests, BoardTests) {
         Board b = Board(trie_file, extensions_file);
@@ -42,4 +37,23 @@ TEST(WordlistTests, DawgTests) {
         ASSERT_FALSE(d.contains("E"));
         ASSERT_FALSE(d.contains("F"));
         ASSERT_FALSE(d.contains("G"));
+}
+
+
+TEST(WordlistTests, FullTest) {
+        Dawg d = Dawg();
+
+        std::fstream file =
+            std::fstream(wordlist_file.c_str(), std::ios_base::in);
+        std::string line;
+        while (std::getline(file, line)) {
+                std::istringstream stream(line);
+                std::string word;
+                if (!(stream >> word)) {
+                        std::cerr << line << '\n';
+                        continue;
+                }
+
+                assert(d.contains(word));
+        }
 }

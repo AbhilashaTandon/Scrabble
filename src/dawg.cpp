@@ -1,9 +1,12 @@
 #include "../include/dawg.h"
+#include "../include/parse_cli_args.h"
 #include <algorithm>
+#include <cassert>
 #include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <stack>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -42,6 +45,8 @@ void Dawg::build_dawg() {
         std::fstream file =
             std::fstream(wordlist_file.c_str(), std::ios_base::in);
         std::string line;
+        
+        int num_words = 0;
         while (std::getline(file, line)) {
                 std::istringstream stream(line);
                 std::string word;
@@ -52,7 +57,11 @@ void Dawg::build_dawg() {
                 insert_word(word);
                 assert(start->parents.size() == 0);
                 assert(end->children.size() == 0);
+                num_words++;
         }
+        
+        assert(num_words > 0);
+        assert(has_children(start));
         replace_or_register(start);
 }
 
@@ -62,21 +71,81 @@ std::pair<DawgNode *, size_t> Dawg::find_common_prefix(std::string word) const {
                 // std::cout << "\t" << word[i] << " " << i << "\n";
                 auto itr = current->children.find(word[i]);
                 if (itr == current->children.end()) {
+                        //next letter not found
                         return std::make_pair(current, i);
                 }
                 current = itr->second;
         }
 
         if (!current->children.contains(end->c)) {
+                //prefix found but not word
+                //if words in alphabetical order this should never happen
+                assert(false);
                 return std::make_pair(current, word.size());
         }
 
         return std::make_pair(end, word.size() + 1);
 }
 
+
+std::pair<DawgNode *, size_t> Dawg::find_common_suffix(std::string word) const {
+        DawgNode *current = start;
+        for (size_t i = word.size() - 1; i >= 0; i--) {
+                // std::cout << "\t" << word[i] << " " << i << "\n";
+                auto itr = current->children.find(word[i]);
+                if (itr == current->children.end()) {
+                        //next letter not found
+                        return std::make_pair(current, i);
+                }
+                current = itr->second;
+        }
+
+        if (!current->children.contains(end->c)) {
+                //prefix found but not word
+                //if words in alphabetical order this should never happen
+                assert(false);
+                return std::make_pair(current, 0);
+        }
+
+        return std::make_pair(end, 0);
+}
+
 bool Dawg::contains(std::string word) const {
         auto [last_state, idx] = find_common_prefix(word);
         return last_state == end;
+}
+
+
+void Dawg::add_prefix(DawgNode *last_state, std::string word, size_t index) {
+        if (last_state == end) {
+                return;
+        }
+        assert(last_state != nullptr);
+        DawgNode *current = last_state;
+
+        for (size_t i = index; i >= 0; i++) {
+                assert(current != end);
+                assert(end->c == '>');
+                DawgNode *new_node = new DawgNode(word[i]);
+                num_nodes++;
+                assert(end->c == '>');
+                assert(new_node != end);
+                assert(!current->children.contains(word[i]));
+                current->children[word[i]] = new_node;
+                new_node->parents.push_back(current);
+                // std::cout << "\tJust added: " << current-> c << " " <<
+                // new_node->c << " " << i << '\n';
+                current = new_node;
+                assert(!current->children.contains(end->c));
+        }
+
+        assert(current->c == word[0]);
+
+        assert(!current->children.contains(end->c));
+        current->children[end->c] = end;
+
+        // std::cout << current->c << '\n';
+        end->parents.push_back(current);
 }
 
 void Dawg::add_suffix(DawgNode *last_state, std::string word, size_t index) {
@@ -238,14 +307,14 @@ void Dawg::print() const {
 std::vector<std::string>
 Dawg::get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
                            DawgNode *node, std::string word_path,
-                           std::vector<std::string> &words,  int max_depth) const {
+                           std::vector<std::string> &words,
+                           int max_depth) const {
 
         if (node->children.contains(end->c)) {
                 words.push_back(word_path);
         }
 
-
-        if(word_path.size() == max_depth){
+        if (word_path.size() == max_depth) {
                 return words;
         }
 
@@ -274,24 +343,22 @@ Dawg::get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
                                             char(itr->first +
                                                  32), // make it lowercase to
                                                       // distinguish blanks
-                                        words,  max_depth);
+                                        words, max_depth);
                                 (*rack_itr).second = false;
                         }
-
-
                 }
 
                 char c = char(rack_itr->first + 64);
                 if (!node->children.contains(c)) {
-                        // if no words exist with word path prefix and the given
-                        // tile
+                        // if no words exist with word path prefix and tile
                         continue;
                 }
 
                 (*rack_itr).second = true;
                 // mark tile as used
-                std::vector<std::string> new_words = get_words_from_tiles(
-                    rack, node->children[c], word_path + c, words,  max_depth);
+                std::vector<std::string> new_words =
+                    get_words_from_tiles(rack, node->children[c], word_path + c,
+                                         words, max_depth); // recurse
                 (*rack_itr).second = false;
         }
 
@@ -299,13 +366,59 @@ Dawg::get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
 }
 
 std::vector<std::string>
-Dawg::get_words_from_tiles(std::unordered_multiset<Tile> &rack, int max_depth) const {
+Dawg::get_words_from_tiles(std::unordered_multiset<Tile> &rack,
+                           int max_depth) const {
         std::vector<std::string> words{};
         std::unordered_multimap<Tile, bool> used_tiles{};
         // we use a map here to keep track of what tiles we've used so we don't
         // have to modify the rack parameter
+
         for (Tile t : rack) {
                 used_tiles.insert(std::pair(t, false));
         }
         return get_words_from_tiles(used_tiles, start, "", words, max_depth);
 }
+
+// std::vector<extension> Dawg::get_extensions(std::unordered_multiset<Tile> &rack,
+//                                             std::string word) const {
+//
+//         std::vector<extension> exts{};
+//         std::stack<std::pair<std::string, DawgNode *>> nodes_to_search{};
+//         // find prefixes
+//         auto [end_node, idx] = find_common_prefix(word);
+//
+//         // depth first search of nodes following the final node of word
+//         for (auto itr = end_node->children.begin();
+//              itr != end_node->children.end(); itr++) {
+//                 if (itr->second == end) {
+//                         continue;
+//                         // we have no suffix yet, we don't want to return the
+//                         // word itself
+//                 }
+//                 nodes_to_search.push(
+//                     std::make_pair(std::string(1, itr->first), itr->second));
+//                 // add all starting points
+//         }
+//
+//         while (!nodes_to_search.empty()) {
+//                 auto [suffix, node] = nodes_to_search.top();
+//                 nodes_to_search.pop();
+//
+//                 for (auto itr = node->children.begin();
+//                      itr != node->children.end(); itr++) {
+//                         if ((itr->second) == end) {
+//                                 // add suffix if endpoint reached
+//                                 exts.push_back(
+//                                     std::pair("", suffix + itr->first));
+//                         } else {
+//                                 nodes_to_search.push(std::make_pair(
+//                                     suffix + itr->first, itr->second));
+//                         }
+//                 }
+//         }
+//
+//         // add search for prefixes
+//         //  maybe store prefix dawg? gwad i guess
+//
+//         return exts;
+// }

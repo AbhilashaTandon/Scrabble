@@ -59,11 +59,19 @@ class Dawg {
         bool contains(std::string word) const;
         // current maybe could be a reference
         std::vector<std::string>
-        get_words_from_tiles(std::unordered_multiset<Tile> &rack, int max_depth) const;
+        get_words_from_tiles(std::unordered_multiset<Tile> &rack,
+                             int max_depth) const;
         std::vector<std::string>
         get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
                              DawgNode *node, std::string word_path,
-                             std::vector<std::string> &words,  int max_depth) const;
+                             std::vector<std::string> &words,
+                             int max_depth) const;
+
+        // std::vector<extension>
+        // get_extensions(std::unordered_multiset<Tile> &rack,
+        //                std::string word) const;
+
+        std::string wordlist_file_path;
 
       private:
         DawgNode *start;
@@ -72,7 +80,12 @@ class Dawg {
         void replace_or_register(DawgNode *d);
         std::pair<DawgNode *, size_t>
         find_common_prefix(std::string word) const;
+        std::pair<DawgNode *, size_t>
+        find_common_suffix(std::string word) const;
+
         void add_suffix(DawgNode *last_state, std::string word, size_t index);
+
+        void add_prefix(DawgNode *last_state, std::string word, size_t index);
         bool has_children(DawgNode *d) const;
         int num_nodes;
 };
