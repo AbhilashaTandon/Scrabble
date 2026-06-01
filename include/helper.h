@@ -1,5 +1,6 @@
 #ifndef HELPER_H
 #define HELPER_H
+
 // Contains small helper functions and lookup tables used throughout the
 // codebase
 #include <cstdint>

@@ -5,37 +5,19 @@ project(scrabble)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL http/github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-)
-
-# set(CMAKE_CXX_FLAGS_DEBUG_INIT "-g -O0")
-# set(CMAKE_CXX_FLAGS_RELEASE_INIT "-O3")
-#
-# add_compile_options(-Wall -Wextra -Wpedantic ${CXX_FLAGS})
-
 set(
 SOURCES
-        src/board.cpp
-        src/extensions.cpp
-        src/helper.cpp
-        src/trie.cpp
-        src/dawg.cpp
-        src/parse_gcg.cpp
-        src/parse_cli_args.cpp
-        src/bot.cpp
         include/board.h
-        include/extensions.h
-        include/trie.h
+        include/bot.h
         include/dawg.h
-        include/bot.h
         include/helper.h
-        include/print.h
         include/parse_gcg.h
-        include/parse_cli_args.h
-        include/bot.h
+        include/print.h
+        src/board.cpp
+        src/bot.cpp
+        src/dawg.cpp
+        src/helper.cpp
+        src/parse_gcg.cpp
 )
 
 add_executable(scrabble_debug
@@ -56,13 +38,15 @@ target_compile_options(scrabble PUBLIC -Wall -Wextra -Wpedantic -O3)
 
 enable_testing()
 
+
+
 add_executable(
   scrabble_test
   src/test.cpp
   tests/helper_test.cpp
   tests/board_test.cpp
-  tests/test_gtest.cpp
   tests/wordlist_test.cpp
+  deps/doctest.h
   ${SOURCES}
 )
 
@@ -70,17 +54,15 @@ target_include_directories(scrabble_test PUBLIC include/)
 
 target_compile_options(scrabble_test PUBLIC -Wall -Wextra -Wpedantic -g -O0)
 
+# Make test executable
+target_compile_features(scrabble_test PRIVATE cxx_std_17) # or later version
 
-find_package(GTest REQUIRED)
 find_package(benchmark REQUIRED)
 
 target_link_libraries(
   scrabble_test
-  GTest::gtest_main
 )
 
 target_link_libraries(scrabble_test benchmark::benchmark)
 target_link_libraries(scrabble_debug benchmark::benchmark)
 
-include(GoogleTest)
-gtest_discover_tests(scrabble_test)

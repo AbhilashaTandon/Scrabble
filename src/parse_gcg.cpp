@@ -6,8 +6,8 @@
 #include <sstream>
 #include <string>
 
-GCGParser::GCGParser(std::string file_path)
-    : b(trie_file, extensions_file), file_path(file_path) {
+GCGParser::GCGParser(std::string wordlist_file, std::string file_path)
+    : b(wordlist_file), file_path(file_path) {
         player1 = "player1";
         player2 = "player2";
 }
@@ -21,7 +21,7 @@ void GCGParser::reset(std::string file_path) {
 
 bool GCGParser::validate_game(bool verbose) {
 
-        std::fstream file = std::fstream((games_dir + "/" + file_path).c_str(),
+        std::fstream file = std::fstream((file_path).c_str(),
                                          std::ios_base::in);
         // read in file
 

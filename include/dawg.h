@@ -1,6 +1,6 @@
 #ifndef DAWG_H
 #define DAWG_H
-#include "parse_cli_args.h"
+#include "helper.h"
 #include <algorithm>
 #include <functional>
 #include <string>
@@ -50,7 +50,7 @@ bool remove_from_vector(std::vector<DawgNode *> &vec, DawgNode *item);
 
 class Dawg {
       public:
-        Dawg();
+        Dawg(std::string wordlist_file);
         void build_dawg();
         void insert_word(std::string word);
         void print() const;
@@ -75,6 +75,7 @@ class Dawg {
         void add_suffix(DawgNode *last_state, std::string word, size_t index);
         bool has_children(DawgNode *d) const;
         int num_nodes;
+        std::string wordlist_file;
 };
 
 #endif

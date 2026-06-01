@@ -1,4 +1,5 @@
 #include "../include/dawg.h"
+#include <cassert>
 #include <algorithm>
 #include <cstddef>
 #include <fstream>
@@ -20,7 +21,7 @@ bool remove_from_vector(std::vector<DawgNode *> &vec, DawgNode *item) {
         return found;
 }
 
-Dawg::Dawg() {
+Dawg::Dawg(std::string wordlist_file) : wordlist_file(wordlist_file){
         assert(wordlist_file != "");
         start = new DawgNode('<');
         end = new DawgNode('>');
@@ -132,7 +133,7 @@ void Dawg::replace_or_register(DawgNode *d) {
         char last_letter = 0;
         for (char letter = 'Z'; letter >= 'A'; letter--) {
                 if (d->children.contains(letter)) {
-                        last_child = d->children[letter];
+                        last_child = d->children.at(letter);
                         last_letter = letter;
                         break;
                 }
@@ -164,7 +165,7 @@ void Dawg::replace_or_register(DawgNode *d) {
                                 continue;
                         }
 
-                        DawgNode *child = last_child->children[letter];
+                        DawgNode *child = last_child->children.at(letter);
 
                         assert(find_in_vector(child->parents, saved));
                         assert(find_in_vector(child->parents, last_child));
@@ -225,7 +226,7 @@ void Dawg::print(DawgNode *current, std::string indent, bool is_last,
                                 continue;
                         }
 
-                        print(current->children[letter], indent,
+                        print(current->children.at(letter), indent,
                               i == num_children - 1, backwards);
                         i++;
                 }
@@ -293,7 +294,7 @@ Dawg::get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
                 (*rack_itr).second = true;
                 // mark tile as used
                 std::vector<std::string> new_words = get_words_from_tiles(
-                    rack, node->children[c], word_path + c, words,  max_depth);
+                    rack, node->children.at(c), word_path + c, words,  max_depth);
                 (*rack_itr).second = false;
         }
 

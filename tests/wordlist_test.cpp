@@ -1,25 +1,25 @@
 
-#include "../include/board.h"
-#include "../include/parse_cli_args.h"
-#include "../include/trie.h"
-#include <gtest/gtest.h>
+#include "../include/dawg.h"
+#include <fstream>
+#include "../deps/doctest.h"
+#include <sstream>
+#include <string>
+#include "../include/wordlist.h"
 
-TEST(WordlistTests, WordTests) {
-        Trie w = Trie(trie_file);
-        ASSERT_TRUE(w.contains("AA"));
-        ASSERT_TRUE(w.contains("AB"));
-        ASSERT_TRUE(w.contains("CAKE"));
-        ASSERT_TRUE(w.contains("ZEPHYR"));
-        ASSERT_FALSE(w.contains("BB"));
-        ASSERT_FALSE(w.contains("JKDKFDKFD"));
-}
 
-TEST(WordlistTests, BoardTests) {
-        Board b = Board(trie_file, extensions_file);
-        ASSERT_TRUE(b.contains("AA"));
-        ASSERT_TRUE(b.contains("AB"));
-        ASSERT_TRUE(b.contains("CAKE"));
-        ASSERT_TRUE(b.contains("ZEPHYR"));
-        ASSERT_FALSE(b.contains("BB"));
-        ASSERT_FALSE(b.contains("JKDKFDKFD"));
+TEST_CASE("DawgTests") {
+        Dawg d = Dawg("../wordlists/NWL2023-modified.txt");
+
+        std::fstream file =
+            std::fstream("../wordlists/NWL2023-modified.txt", std::ios_base::in);
+        std::string line;
+        while (std::getline(file, line)) {
+                std::istringstream stream(line);
+                std::string word;
+                if (!(stream >> word)) {
+                        INFO((line + "\n"));
+                        continue;
+                }
+                REQUIRE(d.contains(word));
+        }
 }

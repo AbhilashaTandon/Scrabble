@@ -1,8 +1,7 @@
 #ifndef BOARD_H
 #define BOARD_H
-#include "extensions.h"
 #include "helper.h"
-#include "trie.h"
+#include "dawg.h"
 #include <array>
 #include <cstdint>
 #include <unordered_set>
@@ -27,7 +26,8 @@ struct Word {
 
 class Board {
       public:
-        Board(std::string trie_file_path, std::string ext_file_path);
+        Board();
+        Board(std::string wordlist_file);
 
         std::vector<struct Word> make_play(std::array<tile_place_t, 7>);
         void pass();
@@ -51,8 +51,6 @@ class Board {
 
         void reset();
 
-      protected:
-        extension_map extensions;
 
       private:
         score_t score_a;
@@ -62,10 +60,11 @@ class Board {
         std::unordered_multiset<Tile> rack_a;
         std::unordered_multiset<Tile> rack_b;
         std::uint16_t move_count;
-        Trie wordlist;
+        Dawg wordlist;
         std::vector<struct Word>
         get_formed_words(std::array<tile_place_t, 7> play,
                          bool is_vertical) const; // gets new words formed by move
+        std::string wordlist_file;
 
         std::unordered_multiset<Tile> draw_tiles(tilecount_t num_tiles);
 
@@ -80,5 +79,6 @@ class Board {
         score_t add_score(struct Word w);
 
         bool remove_tiles_from_rack(std::string letters_to_remove);
+
 };
 #endif
