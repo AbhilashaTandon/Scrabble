@@ -1,7 +1,6 @@
 #include "../include/board.h"
 #include "../include/helper.h"
 #include "../include/print.h"
-#include "../include/trie.h"
 #include <cassert>
 #include <cctype>
 #include <codecvt>
@@ -18,8 +17,8 @@
 #define min(x, y) ((x) < (y)) ? (x) : (y)
 #define max(x, y) ((x) > (y)) ? (x) : (y)
 
-Board::Board(std::string trie_file_path, std::string ext_file_path)
-    : wordlist(trie_file_path) {
+
+Board::Board() : wordlist("placeholder"){
 
         for (int i = 0; i < 30; i++) {
                 tilecount_t count = tile_freq[i];
@@ -38,7 +37,32 @@ Board::Board(std::string trie_file_path, std::string ext_file_path)
         rack_a = draw_tiles(7);
         rack_b = draw_tiles(7);
 
-        extensions = read_file(ext_file_path);
+
+        score_a = 0;
+        score_b = 0;
+        move_count = 0;
+}
+
+Board::Board(std::string wordlist_file)
+    : wordlist(wordlist_file), wordlist_file(wordlist_file){
+
+        for (int i = 0; i < 30; i++) {
+                tilecount_t count = tile_freq[i];
+                for (tilecount_t j = 0; j < count; j++) {
+                        bag.push_back((Tile)i);
+                }
+        }
+
+        for (int i = 0; i < 225; i++) {
+                board[i] = NONE;
+                bonus_used[i] = false;
+        }
+
+        std::srand(std::time(0));
+
+        rack_a = draw_tiles(7);
+        rack_b = draw_tiles(7);
+
 
         score_a = 0;
         score_b = 0;
@@ -57,9 +81,9 @@ void Board::reset() {
         std::fill(board.begin(), board.end(), Tile::NONE);
 }
 
-bool Board::contains(std::string word) { return wordlist.contains(word); }
+bool Board::contains(std::string word) const { return wordlist.contains(word); }
 
-struct Word Board::get_new_word(tile_place_t tile, bool is_vertical) {
+struct Word Board::get_new_word(tile_place_t tile, bool is_vertical) const {
         position_t p = tile.second;
         coords_t coords = get_xy(p);
         int x_coord = coords.first;
@@ -120,7 +144,7 @@ struct Word Board::get_new_word(tile_place_t tile, bool is_vertical) {
 }
 
 std::vector<struct Word>
-Board::get_formed_words(std::array<tile_place_t, 7> play, bool is_vertical) {
+Board::get_formed_words(std::array<tile_place_t, 7> play, bool is_vertical) const {
 
         std::vector<struct Word> formed_words = std::vector<struct Word>();
 
@@ -167,7 +191,7 @@ void Board::bonus_or_penalty(int point_diff, bool is_player_a) {
         }
 }
 
-score_t Board::get_score(bool player_a) { return player_a ? score_a : score_b; }
+score_t Board::get_score(bool player_a) const { return player_a ? score_a : score_b; }
 
 std::vector<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
         // to be a valid scrabble move all letters must be in either one row or
@@ -292,23 +316,22 @@ std::vector<struct Word> Board::make_play(std::array<tile_place_t, 7> play) {
 
         std::vector<struct Word> new_words = get_formed_words(play, vertical);
 
+         for (struct Word new_word : new_words) {
+                 if (contains(new_word.word)) {
+                         continue;
+                 }
+                 std::cerr << int(new_word.word[0]) << '\n';
+                 std::cerr << "Invalid word " << new_word.word << '\n';
+                 // for (int j = 0; j < 7; j++) { // remove tiles if invalid word
+                 //         if (play[j].first == NONE) {
+                 //                 continue;
+                 //         }
+                 //         position_t p = play[j].second;
+                 //         board[p] = Tile::NONE;
+                 // }
         // temporarily disable invalid word detection for testing
-        //  for (struct Word new_word : new_words) {
-        //          if (contains(new_word.word)) {
-        //                  continue;
-        //          }
-        //          std::cerr << int(new_word.word[0]) << '\n';
-        //          std::cerr << "Invalid word " << new_word.word << '\n';
-        //          for (int j = 0; j < 7; j++) { // remove tiles if invalid
-        //          word
-        //                  if (play[j].first == NONE) {
-        //                          continue;
-        //                  }
-        //                  position_t p = play[j].second;
-        //                  board[p] = Tile::NONE;
-        //          }
-        //          return std::vector<struct Word>();
-        //  }
+                 // return std::vector<struct Word>();
+         }
 
         std::string letters_played = "";
 

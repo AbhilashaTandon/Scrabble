@@ -4,11 +4,10 @@
 #define PARSE_GCG_H
 #include "board.h"
 #include "helper.h"
-#include "parse_cli_args.h"
 
 class GCGParser {
 public:
-        GCGParser(std::string file_path);
+        GCGParser(std::string wordlist_file, std::string file_path);
         bool validate_game(bool verbose);
         bool parse_move(std::string line, bool verbose);
         void reset(std::string file_path);

@@ -37,7 +37,7 @@ Tile make_tile(char c){
         if (isupper(c)) {
                 return Tile(c - 'A' + 1);
         } else if (islower(c)) {
-                return Tile(c - 'a' + 30 );
+                return Tile(c - 'a' + 33);
                 //convert to blank variant
         } else {
                 return Tile::NONE;

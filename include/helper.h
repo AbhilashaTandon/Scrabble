@@ -1,5 +1,6 @@
 #ifndef HELPER_H
 #define HELPER_H
+
 // Contains small helper functions and lookup tables used throughout the
 // codebase
 #include <cstdint>
@@ -161,4 +162,6 @@ uint32_t get_bitmask(std::vector<Tile> tiles);
 
 const position_t PASS = 225;
 
+
 #endif
+
