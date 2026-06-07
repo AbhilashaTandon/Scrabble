@@ -57,6 +57,7 @@ class Dawg {
         Dawg(const std::string &wordlist_file);
         void insert_word(const std::string &word);
         void print() const;
+        //raw pointers are fine here because this is a data structure and other code shouldn't need to use pointers to DawgNodes
         void print(DawgNode *current, std::string indent, bool is_last,
                    bool backwards) const;
         bool contains(const std::string &word) const;
@@ -97,8 +98,6 @@ class Dawg {
                        std::vector<std::string> &exts, const size_t &max_prefix_len, const size_t &max_suffix_len
 
         ) const;
-
-
 };
 
 #endif

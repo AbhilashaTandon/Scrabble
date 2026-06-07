@@ -2,6 +2,7 @@
 #include "../include/helper.h"
 #include "../include/print.h"
 #include "../include/wordlist.h"
+#include "../include/board.h"
 #include <algorithm>
 #include <cassert>
 #include <cctype>
@@ -82,9 +83,11 @@ void Board::reset() {
 
 bool Board::contains(const std::string &word) const {
         std::string upper = word;
-            std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+        std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
         return wordlist.contains(upper);
 }
+
+void Board::end_game() {}
 
 struct Word Board::get_new_word(const tile_place_t &tile,
                                 bool is_vertical) const {
@@ -147,9 +150,8 @@ struct Word Board::get_new_word(const tile_place_t &tile,
         return Word("", 0, 0);
 }
 
-std::vector<struct Word>
-Board::get_formed_words(const move_t &play,
-                        bool is_vertical) const {
+std::vector<struct Word> Board::get_formed_words(const move_t &play,
+                                                 bool is_vertical) const {
 
         std::vector<struct Word> formed_words = std::vector<struct Word>();
 
@@ -167,7 +169,7 @@ Board::get_formed_words(const move_t &play,
 
         struct Word a = Word("", 0, 0);
         struct Word b = Word("", 0, 1);
-        assert(a != b);
+        // assert(a != b);
 
         // extra words
 
@@ -200,8 +202,7 @@ score_t Board::get_score(bool player_a) const {
         return player_a ? score_a : score_b;
 }
 
-std::vector<struct Word>
-Board::make_play(const move_t &play) {
+std::vector<struct Word> Board::make_play(const move_t &play) {
         // to be a valid scrabble move all letters must be in either one row or
         // column, and all words formed by these new letters must be valid
 
@@ -363,6 +364,14 @@ Board::make_play(const move_t &play) {
                 return std::vector<struct Word>();
         }
 
+        update_score(new_words, play, num_tiles_played);
+
+        move_count++;
+        return new_words;
+}
+
+void Board::update_score(std::vector<Word> &new_words, const move_t &play,
+                         int num_tiles_played) {
         for (struct Word new_word : new_words) {
                 score_t score = add_score(new_word);
                 if (move_count % 2 == 0) {
@@ -396,11 +405,7 @@ Board::make_play(const move_t &play) {
                 }
                 bonus_used[pos] = true;
         }
-
-        move_count++;
-        return new_words;
 }
-
 std::unordered_multiset<Tile> Board::draw_tiles(tilecount_t num_tiles) {
         std::unordered_multiset<Tile> selection =
             std::unordered_multiset<Tile>();

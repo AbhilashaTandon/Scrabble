@@ -6,7 +6,7 @@
 #include "helper.h"
 
 class GCGParser {
-public:
+      public:
         GCGParser(std::string wordlist_file, std::string file_path);
         bool validate_game(bool verbose);
         bool parse_move(std::string line, bool verbose);
@@ -17,6 +17,11 @@ public:
         std::string player2;
         Board b;
         std::string file_path;
+
+        bool parse_special_actions(std::string &position,
+                                   std::istringstream &stream,
+                                   int &point_difference, int &updated_score,
+                                   bool is_player_1, bool &retFlag);
 };
 
 #endif

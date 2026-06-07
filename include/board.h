@@ -1,10 +1,11 @@
 #ifndef BOARD_H
 #define BOARD_H
-#include "helper.h"
 #include "dawg.h"
+#include "helper.h"
 #include "word.h"
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <unordered_set>
 #include <vector>
 
@@ -13,7 +14,7 @@ class Board {
         Board();
         Board(const std::string &wordlist_file);
 
-        std::vector<struct Word> make_play(const move_t&);
+        std::vector<struct Word> make_play(const move_t &);
         void pass();
         bool exchange_letters(const std::string &letters_to_remove);
 
@@ -31,10 +32,10 @@ class Board {
 
         char get_letter(uint8_t x, uint8_t y) const;
 
-        struct Word get_new_word(const tile_place_t &tile, bool is_vertical) const;
+        struct Word get_new_word(const tile_place_t &tile,
+                                 bool is_vertical) const;
 
         void reset();
-
 
       private:
         score_t score_a;
@@ -45,15 +46,16 @@ class Board {
         std::unordered_multiset<Tile> rack_b;
         std::uint16_t move_count;
         Dawg wordlist;
-        std::vector<struct Word>
-        get_formed_words(const move_t &play,
-                         bool is_vertical) const; // gets new words formed by move
+        std::vector<struct Word> get_formed_words(
+            const move_t &play,
+            bool is_vertical) const; // gets new words formed by move
         std::string wordlist_file;
 
         std::unordered_multiset<Tile> draw_tiles(tilecount_t num_tiles);
 
-        // std::vector<struct Word> words_on_board{};
-        // std::array<struct Word*, 225> pos_to_word_map;
+        // std::vector<std::shared_ptr<struct Word>> words_on_board{};
+        // std::array<std::shared_ptr<struct Word>, 225> pos_to_horiz_word_map;
+        // std::array<std::shared_ptr<struct Word>, 225> pos_to_vert_word_map;
 
         std::vector<uint32_t> horiz_move_letter_opts;
         std::vector<uint32_t> vert_move_letter_opts;
@@ -65,7 +67,10 @@ class Board {
 
         score_t add_score(const struct Word &w);
 
-        bool remove_tiles_from_rack(const std::string &letters_to_remove);
+        void update_score(std::vector<Word> &new_words, const move_t &play,
+                          int num_tiles_played);
 
+        bool remove_tiles_from_rack(const std::string &letters_to_remove);
 };
+
 #endif

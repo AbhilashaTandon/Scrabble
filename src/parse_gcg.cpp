@@ -21,8 +21,8 @@ void GCGParser::reset(std::string file_path) {
 
 bool GCGParser::validate_game(bool verbose) {
 
-        std::fstream file = std::fstream((file_path).c_str(),
-                                         std::ios_base::in);
+        std::fstream file =
+            std::fstream((file_path).c_str(), std::ios_base::in);
         // read in file
 
         std::string line;
@@ -119,46 +119,12 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
 
         stream >> position;
 
-        if (position == "(challenge)") {
-                std::cout << "Previous word challenged!\n";
-                stream >> point_difference;
-                stream >> updated_score;
-
-                b.bonus_or_penalty(point_difference, is_player_1);
-
-                return b.get_score(is_player_1) == updated_score;
-        } else if (position == "(time)") {
-                std::cout << "Time limit exceeded!\n";
-                stream >> point_difference;
-                stream >> updated_score;
-
-                b.bonus_or_penalty(point_difference, is_player_1);
-
-                return b.get_score(is_player_1) == updated_score;
-        } else if (position[0] == '(') {
-                // removing points for tiles left at end of game
-                stream >> point_difference;
-                stream >> updated_score;
-
-                return true;
-        } else if (position == "-") {
-                // pass
-                b.pass();
-                return true;
-
-        } else if (position == "--") {
-                std::cout << "Withdrawal of challenged phoney!\n";
-                // Withdrawal of challenged phoney
-                stream >> point_difference;
-                stream >> updated_score;
-
-                b.bonus_or_penalty(point_difference, is_player_1);
-
-                return b.get_score(is_player_1) == updated_score;
-        } else if (position[0] == '-') {
-                // tile exchange
-                return b.exchange_letters(position.substr(1));
-        }
+        bool retFlag;
+        bool retVal =
+            parse_special_actions(position, stream, point_difference,
+                                  updated_score, is_player_1, retFlag);
+        if (retFlag)
+                return retVal;
 
         // parse position
 
@@ -276,4 +242,53 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
         }
 
         return result && correct_score;
+}
+
+bool GCGParser::parse_special_actions(std::string &position,
+                                      std::istringstream &stream,
+                                      int &point_difference, int &updated_score,
+                                      bool is_player_1, bool &retFlag) {
+        retFlag = true;
+        if (position == "(challenge)") {
+                std::cout << "Previous word challenged!\n";
+                stream >> point_difference;
+                stream >> updated_score;
+
+                b.bonus_or_penalty(point_difference, is_player_1);
+
+                return b.get_score(is_player_1) == updated_score;
+        } else if (position == "(time)") {
+                std::cout << "Time limit exceeded!\n";
+                stream >> point_difference;
+                stream >> updated_score;
+
+                b.bonus_or_penalty(point_difference, is_player_1);
+
+                return b.get_score(is_player_1) == updated_score;
+        } else if (position[0] == '(') {
+                // removing points for tiles left at end of game
+                stream >> point_difference;
+                stream >> updated_score;
+
+                return true;
+        } else if (position == "-") {
+                // pass
+                b.pass();
+                return true;
+
+        } else if (position == "--") {
+                std::cout << "Withdrawal of challenged phoney!\n";
+                // Withdrawal of challenged phoney
+                stream >> point_difference;
+                stream >> updated_score;
+
+                b.bonus_or_penalty(point_difference, is_player_1);
+
+                return b.get_score(is_player_1) == updated_score;
+        } else if (position[0] == '-') {
+                // tile exchange
+                return b.exchange_letters(position.substr(1));
+        }
+        retFlag = false;
+        return {};
 }
