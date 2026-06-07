@@ -21,5 +21,4 @@ TEST_CASE("DawgTests") {
                 }
                 REQUIRE(d.contains(word));
         }
-
 }

@@ -13,11 +13,13 @@ SOURCES
         include/helper.h
         include/parse_gcg.h
         include/print.h
+        include/word.h
         src/board.cpp
         src/bot.cpp
         src/dawg.cpp
         src/helper.cpp
         src/parse_gcg.cpp
+        src/word.cpp
 )
 
 add_executable(scrabble_debug

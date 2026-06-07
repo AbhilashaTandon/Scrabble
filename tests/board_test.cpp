@@ -13,7 +13,7 @@ TEST_CASE("BoardTests") {
 
         SUBCASE("Horizontal play") {
                 b.reset();
-                std::array<tile_place_t, 7> play;
+                move_t play;
                 play[0] = std::make_pair(Tile::A, get_pos(3, 7));
                 play[1] = std::make_pair(Tile::C, get_pos(4, 7));
                 play[2] = std::make_pair(Tile::A, get_pos(5, 7));
@@ -41,7 +41,7 @@ TEST_CASE("BoardTests") {
 
         SUBCASE("Gap") {
                 b.reset();
-                std::array<tile_place_t, 7> play;
+                move_t play;
                 play[0] = std::make_pair(Tile::E, get_pos(3, 7));
                 play[1] = std::make_pair(Tile::B, get_pos(4, 7));
                 play[2] = std::make_pair(Tile::B, get_pos(5, 7));
@@ -57,7 +57,7 @@ TEST_CASE("BoardTests") {
 
         SUBCASE("Overlap") {
                 b.reset();
-                std::array<tile_place_t, 7> play;
+                move_t play;
 
                 play[0] = std::make_pair(Tile::A, get_pos(14, 4));
                 play[1] = std::make_pair(Tile::C, get_pos(14, 4));
@@ -73,7 +73,7 @@ TEST_CASE("BoardTests") {
 
         SUBCASE("Vertical") {
                 b.reset();
-                std::array<tile_place_t, 7> play;
+                move_t play;
 
                 play[0] = std::make_pair(Tile::A, get_pos(14, 4));
                 play[1] = std::make_pair(Tile::C, get_pos(14, 4));
@@ -89,7 +89,7 @@ TEST_CASE("BoardTests") {
 
         SUBCASE("Separated") {
                 b.reset();
-                std::array<tile_place_t, 7> play;
+                move_t play;
 
                 play[0] = std::make_pair(Tile::A, get_pos(0, 0));
                 play[1] = std::make_pair(Tile::C, get_pos(2, 0));
@@ -105,7 +105,7 @@ TEST_CASE("BoardTests") {
 
         SUBCASE("CrissCross") {
                 b.reset();
-                std::array<tile_place_t, 7> play;
+                move_t play;
                 play[0] = std::make_pair(Tile::A, get_pos(3, 7));
                 play[1] = std::make_pair(Tile::C, get_pos(4, 7));
                 play[2] = std::make_pair(Tile::A, get_pos(5, 7));
@@ -133,7 +133,7 @@ TEST_CASE("BoardTests") {
         SUBCASE("AddOneTile") {
                 b.reset();
 
-                std::array<tile_place_t, 7> play;
+                move_t play;
                 play[0] = std::make_pair(Tile::A, get_pos(3, 7));
                 play[1] = std::make_pair(Tile::C, get_pos(4, 7));
                 play[2] = std::make_pair(Tile::A, get_pos(5, 7));
@@ -161,7 +161,7 @@ TEST_CASE("BoardTests") {
         SUBCASE("FirstMovePass") {
                 b.reset();
 
-                std::array<tile_place_t, 7> play;
+                move_t play;
                 play[0] = std::make_pair(Tile::NONE, get_pos(3, 7));
                 play[1] = std::make_pair(Tile::NONE, get_pos(4, 7));
                 play[2] = std::make_pair(Tile::NONE, get_pos(5, 7));
@@ -177,7 +177,7 @@ TEST_CASE("BoardTests") {
         SUBCASE("SecondMovePass") {
                 b.reset();
 
-                std::array<tile_place_t, 7> play;
+                move_t play;
                 play[0] = std::make_pair(Tile::A, get_pos(3, 7));
                 play[1] = std::make_pair(Tile::C, get_pos(4, 7));
                 play[2] = std::make_pair(Tile::A, get_pos(5, 7));
@@ -204,7 +204,7 @@ TEST_CASE("BoardTests") {
         SUBCASE("NewWords") {
                 b.reset();
 
-                std::array<tile_place_t, 7> play;
+                move_t play;
                 play[0] = std::make_pair(Tile::A, get_pos(3, 7));
                 play[1] = std::make_pair(Tile::C, get_pos(4, 7));
                 play[2] = std::make_pair(Tile::A, get_pos(5, 7));
@@ -246,7 +246,7 @@ TEST_CASE("BoardTests") {
         SUBCASE("NewWords2") {
                 b.reset();
 
-                std::array<tile_place_t, 7> play;
+                move_t play;
                 play[0] = std::make_pair(Tile::A, get_pos(3, 7));
                 play[1] = std::make_pair(Tile::C, get_pos(4, 7));
                 play[2] = std::make_pair(Tile::T, get_pos(5, 7));

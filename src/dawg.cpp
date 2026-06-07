@@ -21,7 +21,7 @@ bool remove_from_vector(std::vector<DawgNode *> &vec, DawgNode *item) {
         return found;
 }
 
-Dawg::Dawg( const std::string &wordlist_file) : wordlist_file(wordlist_file) {
+Dawg::Dawg(const std::string &wordlist_file) : wordlist_file(wordlist_file) {
         assert(wordlist_file != "");
         start = new DawgNode('<');
         end = new DawgNode('>');
@@ -83,7 +83,8 @@ bool Dawg::contains(const std::string &word) const {
         return idx == word.size() + 1;
 }
 
-void Dawg::add_suffix(DawgNode *last_state, const std::string &word, size_t index) {
+void Dawg::add_suffix(DawgNode *last_state, const std::string &word,
+                      size_t index) {
         if (last_state == end) {
                 return;
         }
@@ -308,8 +309,8 @@ Dawg::get_words_from_tiles(const std::unordered_multiset<Tile> &rack,
 }
 
 std::vector<std::string>
-Dawg::get_extensions(const std::unordered_multiset<Tile> &rack, const std::string &word,
-                     const size_t &max_prefix_len,
+Dawg::get_extensions(const std::unordered_multiset<Tile> &rack,
+                     const std::string &word, const size_t &max_prefix_len,
                      const size_t &max_suffix_len) const {
 
         std::unordered_multimap<Tile, bool> used_tiles{};
@@ -331,9 +332,7 @@ void Dawg::get_extensions(std::unordered_multimap<Tile, bool> &rack,
                           std::string word, std::string prefix_path,
                           DawgNode *node, std::vector<std::string> &exts,
                           const size_t &max_prefix_len,
-                          const size_t &max_suffix_len
-
-) const {
+                          const size_t &max_suffix_len) const {
 
         // check if current prefix is valid all on its own
         DawgNode *current = node;
@@ -349,8 +348,9 @@ void Dawg::get_extensions(std::unordered_multimap<Tile, bool> &rack,
 
         if (prefix_found) {
                 std::vector<std::string> with_suffixes;
-                get_words_from_tiles(rack, current, prefix_path + "-" + word + "-", with_suffixes,
-                                     0, max_suffix_len);
+                get_words_from_tiles(rack, current,
+                                     prefix_path + "-" + word + "-",
+                                     with_suffixes, 0, max_suffix_len);
 
                 exts.insert(exts.end(), with_suffixes.begin(),
                             with_suffixes.end());
@@ -387,8 +387,6 @@ void Dawg::get_extensions(std::unordered_multimap<Tile, bool> &rack,
 
                 char c = char(rack_itr->first + 64);
                 if (!node->children.contains(c)) {
-                        // if no words exist with word path prefix and the given
-                        // tile
                         continue;
                 }
 

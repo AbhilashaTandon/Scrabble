@@ -12,3 +12,4 @@ callgrind.*
 log.txt
 d*.txt
 trie.txt
+temp.py

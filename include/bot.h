@@ -5,11 +5,12 @@
 
 class Bot : public Board {
       public:
-        bool make_play(std::array<tile_place_t, 7> play);
-        Bot(std::string wordlist_file_path, std::string trie_file_path,
-              std::string ext_file_path);
+        bool make_play(move_t play);
+        Bot(std::string wordlist_file_path);
+        std::vector<move_t> get_valid_moves() const;
 
       private:
+  //probably want to keep track of all words played
         std::vector<uint32_t> horiz_move_opts;
         std::vector<uint32_t> vert_move_opts;
 };

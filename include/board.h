@@ -2,34 +2,18 @@
 #define BOARD_H
 #include "helper.h"
 #include "dawg.h"
+#include "word.h"
 #include <array>
 #include <cstdint>
 #include <unordered_set>
 #include <vector>
-
-struct Word {
-        std::string word;
-        position_t start;
-        bool is_vertical;
-
-        Word(std::string w, position_t s, bool v)
-            : word(w), start(s), is_vertical(v) {}
-        bool operator<(const Word &other_word) const {
-                return (word < other_word.word);
-        }
-        bool operator==(const Word &other_word) const {
-                return (word == other_word.word) &&
-                       (start == other_word.start) &&
-                       (is_vertical == other_word.is_vertical);
-        }
-};
 
 class Board {
       public:
         Board();
         Board(const std::string &wordlist_file);
 
-        std::vector<struct Word> make_play(const std::array<tile_place_t, 7>&);
+        std::vector<struct Word> make_play(const move_t&);
         void pass();
         bool exchange_letters(const std::string &letters_to_remove);
 
@@ -62,11 +46,14 @@ class Board {
         std::uint16_t move_count;
         Dawg wordlist;
         std::vector<struct Word>
-        get_formed_words(const std::array<tile_place_t, 7> &play,
+        get_formed_words(const move_t &play,
                          bool is_vertical) const; // gets new words formed by move
         std::string wordlist_file;
 
         std::unordered_multiset<Tile> draw_tiles(tilecount_t num_tiles);
+
+        // std::vector<struct Word> words_on_board{};
+        // std::array<struct Word*, 225> pos_to_word_map;
 
         std::vector<uint32_t> horiz_move_letter_opts;
         std::vector<uint32_t> vert_move_letter_opts;

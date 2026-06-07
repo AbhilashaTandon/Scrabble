@@ -148,7 +148,7 @@ struct Word Board::get_new_word(const tile_place_t &tile,
 }
 
 std::vector<struct Word>
-Board::get_formed_words(const std::array<tile_place_t, 7> &play,
+Board::get_formed_words(const move_t &play,
                         bool is_vertical) const {
 
         std::vector<struct Word> formed_words = std::vector<struct Word>();
@@ -201,7 +201,7 @@ score_t Board::get_score(bool player_a) const {
 }
 
 std::vector<struct Word>
-Board::make_play(const std::array<tile_place_t, 7> &play) {
+Board::make_play(const move_t &play) {
         // to be a valid scrabble move all letters must be in either one row or
         // column, and all words formed by these new letters must be valid
 

@@ -223,7 +223,7 @@ bool GCGParser::parse_move(std::string line, bool verbose) {
                 std::cout << line << '\n';
         }
 
-        std::array<tile_place_t, 7> play;
+        move_t play;
         int x_coord = x_start;
         int y_coord = y_start;
         int letter_idx = 0;
