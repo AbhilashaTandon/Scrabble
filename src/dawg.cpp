@@ -21,7 +21,7 @@ bool remove_from_vector(std::vector<DawgNode *> &vec, DawgNode *item) {
         return found;
 }
 
-Dawg::Dawg(std::string wordlist_file) : wordlist_file(wordlist_file) {
+Dawg::Dawg( const std::string &wordlist_file) : wordlist_file(wordlist_file) {
         assert(wordlist_file != "");
         start = new DawgNode('<');
         end = new DawgNode('>');
@@ -78,12 +78,12 @@ std::pair<DawgNode *, size_t> Dawg::find_common_prefix(std::string word) const {
         return std::make_pair(current, word.size() + 1);
 }
 
-bool Dawg::contains(std::string word) const {
+bool Dawg::contains(const std::string &word) const {
         auto [last_state, idx] = find_common_prefix(word);
         return idx == word.size() + 1;
 }
 
-void Dawg::add_suffix(DawgNode *last_state, std::string word, size_t index) {
+void Dawg::add_suffix(DawgNode *last_state, const std::string &word, size_t index) {
         if (last_state == end) {
                 return;
         }
@@ -115,7 +115,7 @@ void Dawg::add_suffix(DawgNode *last_state, std::string word, size_t index) {
         end->parents.push_back(current);
 }
 
-void Dawg::insert_word(std::string word) {
+void Dawg::insert_word(const std::string &word) {
         auto [last_state, idx] = find_common_prefix(word);
         if (last_state == end) {
                 return;
@@ -293,7 +293,7 @@ void Dawg::get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
 }
 
 std::vector<std::string>
-Dawg::get_words_from_tiles(std::unordered_multiset<Tile> &rack,
+Dawg::get_words_from_tiles(const std::unordered_multiset<Tile> &rack,
                            size_t max_depth) const {
         std::vector<std::string> words{};
         std::unordered_multimap<Tile, bool> used_tiles{};
@@ -308,7 +308,7 @@ Dawg::get_words_from_tiles(std::unordered_multiset<Tile> &rack,
 }
 
 std::vector<std::string>
-Dawg::get_extensions(std::unordered_multiset<Tile> &rack, std::string word,
+Dawg::get_extensions(const std::unordered_multiset<Tile> &rack, const std::string &word,
                      const size_t &max_prefix_len,
                      const size_t &max_suffix_len) const {
 
