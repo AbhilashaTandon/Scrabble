@@ -27,27 +27,27 @@ struct Word {
 class Board {
       public:
         Board();
-        Board(std::string wordlist_file);
+        Board(const std::string &wordlist_file);
 
-        std::vector<struct Word> make_play(std::array<tile_place_t, 7>);
+        std::vector<struct Word> make_play(const std::array<tile_place_t, 7>&);
         void pass();
-        bool exchange_letters(std::string letters_to_remove);
+        bool exchange_letters(const std::string &letters_to_remove);
 
         // these cant be struct Words because its legal to play non-adjacent
         // tiles if there are existing tiles between them that form a word
         void print() const;
-        bool contains(std::string word) const;
+        bool contains(const std::string &word) const;
         void end_game();
 
         void bonus_or_penalty(int point_diff, bool is_player_a);
 
         score_t get_score(bool player_a) const;
 
-        void set_rack(std::string new_rack, bool is_player_a);
+        void set_rack(const std::string &new_rack, bool is_player_a);
 
         char get_letter(uint8_t x, uint8_t y) const;
 
-        struct Word get_new_word(tile_place_t tile, bool is_vertical) const;
+        struct Word get_new_word(const tile_place_t &tile, bool is_vertical) const;
 
         void reset();
 
@@ -62,7 +62,7 @@ class Board {
         std::uint16_t move_count;
         Dawg wordlist;
         std::vector<struct Word>
-        get_formed_words(std::array<tile_place_t, 7> play,
+        get_formed_words(const std::array<tile_place_t, 7> &play,
                          bool is_vertical) const; // gets new words formed by move
         std::string wordlist_file;
 
@@ -76,9 +76,9 @@ class Board {
         std::array<bool, 225> bonus_used;
         // we mark this as true whenever a move uses a bonus square
 
-        score_t add_score(struct Word w);
+        score_t add_score(const struct Word &w);
 
-        bool remove_tiles_from_rack(std::string letters_to_remove);
+        bool remove_tiles_from_rack(const std::string &letters_to_remove);
 
 };
 #endif

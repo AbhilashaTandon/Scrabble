@@ -40,7 +40,7 @@ struct DawgNodeHash {
                 for (auto &it : s->children) {
                         h2 ^= std::hash<char>{}(it.first);
                 }
-                return h1 ^ (h2 << 1); // or use boost::hash_combine
+                return h1 ^ (h2 << 1);
         }
 };
 
@@ -54,20 +54,20 @@ bool remove_from_vector(std::vector<DawgNode *> &vec, DawgNode *item);
 
 class Dawg {
       public:
-        Dawg(std::string wordlist_file);
-        void insert_word(std::string word);
+        Dawg(const std::string &wordlist_file);
+        void insert_word(const std::string &word);
         void print() const;
         void print(DawgNode *current, std::string indent, bool is_last,
                    bool backwards) const;
-        bool contains(std::string word) const;
+        bool contains(const std::string &word) const;
         // current maybe could be a reference
         std::vector<std::string>
-        get_words_from_tiles(std::unordered_multiset<Tile> &rack,
+        get_words_from_tiles(const std::unordered_multiset<Tile> &rack,
                              size_t max_depth) const;
 
         std::vector<std::string>
-        get_extensions(std::unordered_multiset<Tile> &rack,
-                       std::string word, const size_t &max_prefix_len, const size_t &max_suffix_len) const;
+        get_extensions(const std::unordered_multiset<Tile> &rack,
+                       const std::string &word, const size_t &max_prefix_len, const size_t &max_suffix_len) const;
 
       private:
         int num_nodes;
@@ -82,7 +82,7 @@ class Dawg {
 
         std::pair<DawgNode *, size_t>
         find_common_prefix(std::string word) const;
-        void add_suffix(DawgNode *last_state, std::string word, size_t index);
+        void add_suffix(DawgNode *last_state, const std::string &word, size_t index);
 
         void
         get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
