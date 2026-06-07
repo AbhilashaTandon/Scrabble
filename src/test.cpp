@@ -1,6 +1,5 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include "../deps/doctest.h"
-#include "../include/wordlist.h"
 
 int main(int argc, char **argv) {
         doctest::Context context;

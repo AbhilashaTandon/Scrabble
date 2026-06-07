@@ -8,10 +8,10 @@
 
 
 TEST_CASE("DawgTests") {
-        Dawg d = Dawg("../wordlists/NWL2023-modified.txt");
+        Dawg d = Dawg(WORDLIST_FILE);
 
         std::fstream file =
-            std::fstream("../wordlists/NWL2023-modified.txt", std::ios_base::in);
+            std::fstream(WORDLIST_FILE, std::ios_base::in);
         std::string line;
         while (std::getline(file, line)) {
                 std::istringstream stream(line);

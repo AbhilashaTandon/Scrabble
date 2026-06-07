@@ -1,6 +1,6 @@
 #include "../include/dawg.h"
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 #include <cstddef>
 #include <fstream>
 #include <iostream>
@@ -21,7 +21,7 @@ bool remove_from_vector(std::vector<DawgNode *> &vec, DawgNode *item) {
         return found;
 }
 
-Dawg::Dawg(std::string wordlist_file) : wordlist_file(wordlist_file){
+Dawg::Dawg(std::string wordlist_file) : wordlist_file(wordlist_file) {
         assert(wordlist_file != "");
         start = new DawgNode('<');
         end = new DawgNode('>');
@@ -74,12 +74,13 @@ std::pair<DawgNode *, size_t> Dawg::find_common_prefix(std::string word) const {
                 return std::make_pair(current, word.size());
         }
 
-        return std::make_pair(end, word.size() + 1);
+        assert(current != end);
+        return std::make_pair(current, word.size() + 1);
 }
 
 bool Dawg::contains(std::string word) const {
         auto [last_state, idx] = find_common_prefix(word);
-        return last_state == end;
+        return idx == word.size() + 1;
 }
 
 void Dawg::add_suffix(DawgNode *last_state, std::string word, size_t index) {
@@ -238,22 +239,17 @@ void Dawg::print() const {
         print(end, "", false, true);
 }
 
-std::vector<std::string>
-Dawg::get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
-                           DawgNode *node, std::string word_path,
-                           std::vector<std::string> &words,  int max_depth) const {
+void Dawg::get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
+                                DawgNode *node, std::string word_path,
+                                std::vector<std::string> &words, size_t depth,
+                                size_t max_depth) const {
 
         if (node->children.contains(end->c)) {
                 words.push_back(word_path);
         }
 
-
-        if(word_path.size() == max_depth){
-                return words;
-        }
-
-        if (rack.empty()) {
-                return words;
+        if (depth >= max_depth) {
+                return;
         }
 
         for (auto rack_itr = rack.begin(); rack_itr != rack.end(); rack_itr++) {
@@ -270,18 +266,15 @@ Dawg::get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
                              itr != node->children.end(); itr++) {
                                 (*rack_itr).second = true;
                                 // mark tile as used
-                                std::vector<std::string> new_words =
-                                    get_words_from_tiles(
-                                        rack, itr->second,
-                                        word_path +
-                                            char(itr->first +
-                                                 32), // make it lowercase to
-                                                      // distinguish blanks
-                                        words,  max_depth);
+                                get_words_from_tiles(
+                                    rack, itr->second,
+                                    word_path +
+                                        char(itr->first +
+                                             32), // make it lowercase to
+                                                  // distinguish blanks
+                                    words, depth + 1, max_depth);
                                 (*rack_itr).second = false;
                         }
-
-
                 }
 
                 char c = char(rack_itr->first + 64);
@@ -293,16 +286,15 @@ Dawg::get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
 
                 (*rack_itr).second = true;
                 // mark tile as used
-                std::vector<std::string> new_words = get_words_from_tiles(
-                    rack, node->children.at(c), word_path + c, words,  max_depth);
+                get_words_from_tiles(rack, node->children.at(c), word_path + c,
+                                     words, depth + 1, max_depth);
                 (*rack_itr).second = false;
         }
-
-        return words;
 }
 
 std::vector<std::string>
-Dawg::get_words_from_tiles(std::unordered_multiset<Tile> &rack, int max_depth) const {
+Dawg::get_words_from_tiles(std::unordered_multiset<Tile> &rack,
+                           size_t max_depth) const {
         std::vector<std::string> words{};
         std::unordered_multimap<Tile, bool> used_tiles{};
         // we use a map here to keep track of what tiles we've used so we don't
@@ -310,5 +302,103 @@ Dawg::get_words_from_tiles(std::unordered_multiset<Tile> &rack, int max_depth) c
         for (Tile t : rack) {
                 used_tiles.insert(std::pair(t, false));
         }
-        return get_words_from_tiles(used_tiles, start, "", words, max_depth);
+        get_words_from_tiles(used_tiles, start, "", words, 0, max_depth);
+
+        return words;
+}
+
+std::vector<std::string>
+Dawg::get_extensions(std::unordered_multiset<Tile> &rack, std::string word,
+                     const size_t &max_prefix_len,
+                     const size_t &max_suffix_len) const {
+
+        std::unordered_multimap<Tile, bool> used_tiles{};
+        // we use a map here to keep track of what tiles we've used so we don't
+        // have to modify the rack parameter
+        for (Tile t : rack) {
+                used_tiles.insert(std::pair(t, false));
+        }
+
+        std::vector<std::string> exts{};
+
+        get_extensions(used_tiles, word, "", start, exts, max_prefix_len,
+                       max_suffix_len);
+
+        return exts;
+}
+
+void Dawg::get_extensions(std::unordered_multimap<Tile, bool> &rack,
+                          std::string word, std::string prefix_path,
+                          DawgNode *node, std::vector<std::string> &exts,
+                          const size_t &max_prefix_len,
+                          const size_t &max_suffix_len
+
+) const {
+
+        // check if current prefix is valid all on its own
+        DawgNode *current = node;
+        bool prefix_found = true;
+        for (char c : word) {
+                if (current->children.contains(c)) {
+                        current = current->children[c];
+                } else {
+                        prefix_found = false;
+                        break;
+                }
+        }
+
+        if (prefix_found) {
+                std::vector<std::string> with_suffixes;
+                get_words_from_tiles(rack, current, prefix_path + "-" + word + "-", with_suffixes,
+                                     0, max_suffix_len);
+
+                exts.insert(exts.end(), with_suffixes.begin(),
+                            with_suffixes.end());
+        }
+
+        if (prefix_path.size() >= max_prefix_len) {
+                return;
+        }
+
+        for (auto rack_itr = rack.begin(); rack_itr != rack.end(); rack_itr++) {
+
+                if (rack_itr->second) {
+                        // if we've used it already
+                        continue;
+                }
+
+                if (rack_itr->first == Tile::BLANK) {
+                        // blank can be any letter
+                        for (auto itr = node->children.begin();
+                             itr != node->children.end(); itr++) {
+                                (*rack_itr).second = true;
+                                // mark tile as used
+                                get_extensions(
+                                    rack, word,
+                                    prefix_path +
+                                        char(itr->first +
+                                             32), // make it lowercase to
+                                                  // distinguish blanks
+                                    itr->second, exts, max_prefix_len,
+                                    max_suffix_len);
+                                (*rack_itr).second = false;
+                        }
+                }
+
+                char c = char(rack_itr->first + 64);
+                if (!node->children.contains(c)) {
+                        // if no words exist with word path prefix and the given
+                        // tile
+                        continue;
+                }
+
+                (*rack_itr).second = true;
+                // mark tile as used
+                get_extensions(rack, word, prefix_path + c,
+                               node->children.at(c), exts, max_prefix_len,
+                               max_suffix_len);
+                (*rack_itr).second = false;
+        }
+
+        return;
 }

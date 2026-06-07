@@ -1,6 +1,7 @@
 #include "../include/board.h"
 #include "../include/helper.h"
 #include "../include/print.h"
+#include "../include/wordlist.h"
 #include <cassert>
 #include <cctype>
 #include <codecvt>
@@ -18,7 +19,7 @@
 #define max(x, y) ((x) > (y)) ? (x) : (y)
 
 
-Board::Board() : wordlist("placeholder"){
+Board::Board() : wordlist(WORDLIST_FILE){
 
         for (int i = 0; i < 30; i++) {
                 tilecount_t count = tile_freq[i];

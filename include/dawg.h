@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <functional>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 
 struct DawgNode {
@@ -19,12 +20,15 @@ struct DawgNode {
                 if (c != rhs.c) {
                         return false;
                 }
+
                 if (children.size() != rhs.children.size()) {
                         return false;
                 }
+
                 if (children.size() == 0) {
                         return true;
                 }
+
                 return children == rhs.children;
         }
 };
@@ -51,7 +55,6 @@ bool remove_from_vector(std::vector<DawgNode *> &vec, DawgNode *item);
 class Dawg {
       public:
         Dawg(std::string wordlist_file);
-        void build_dawg();
         void insert_word(std::string word);
         void print() const;
         void print(DawgNode *current, std::string indent, bool is_last,
@@ -59,23 +62,42 @@ class Dawg {
         bool contains(std::string word) const;
         // current maybe could be a reference
         std::vector<std::string>
-        get_words_from_tiles(std::unordered_multiset<Tile> &rack, int max_depth) const;
+        get_words_from_tiles(std::unordered_multiset<Tile> &rack,
+                             size_t max_depth) const;
+
         std::vector<std::string>
-        get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
-                             DawgNode *node, std::string word_path,
-                             std::vector<std::string> &words,  int max_depth) const;
+        get_extensions(std::unordered_multiset<Tile> &rack,
+                       std::string word, const size_t &max_prefix_len, const size_t &max_suffix_len) const;
 
       private:
+        int num_nodes;
+        std::string wordlist_file;
         DawgNode *start;
         DawgNode *end;
+
         std::unordered_set<DawgNode *, DawgNodeHash, DawgNodeEq> reg;
         void replace_or_register(DawgNode *d);
+        bool has_children(DawgNode *d) const;
+        void build_dawg();
+
         std::pair<DawgNode *, size_t>
         find_common_prefix(std::string word) const;
         void add_suffix(DawgNode *last_state, std::string word, size_t index);
-        bool has_children(DawgNode *d) const;
-        int num_nodes;
-        std::string wordlist_file;
+
+        void
+        get_words_from_tiles(std::unordered_multimap<Tile, bool> &rack,
+                             DawgNode *node, std::string word_path,
+                             std::vector<std::string> &words, size_t depth,
+                             size_t max_depth) const;
+
+        void
+        get_extensions(std::unordered_multimap<Tile, bool> &rack, std::string word,
+                       std::string ext_path, DawgNode *node,
+                       std::vector<std::string> &exts, const size_t &max_prefix_len, const size_t &max_suffix_len
+
+        ) const;
+
+
 };
 
 #endif

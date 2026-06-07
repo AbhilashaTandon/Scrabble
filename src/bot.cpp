@@ -1,5 +1,4 @@
 #include "../include/bot.h"
-#include <cstddef>
 
 // bool Bot::make_play(std::array<tile_place_t, 7> play) {
 //         std::vector<struct Word> formed_words = Board::make_play(play);
