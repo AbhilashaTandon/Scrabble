@@ -38,7 +38,7 @@ struct DawgNodeHash {
                 std::size_t h1 = std::hash<char>{}(s->c);
                 std::size_t h2 = 0;
                 for (auto &it : s->children) {
-                        h2 ^= std::hash<char>{}(it.first);
+                        h2 ^= std::hash<DawgNode*>{}(it.second);
                 }
                 return h1 ^ (h2 << 1);
         }
@@ -76,6 +76,7 @@ class Dawg {
         DawgNode *end;
 
         std::unordered_set<DawgNode *, DawgNodeHash, DawgNodeEq> reg;
+        //about half of the execution time when building a dawg is taken up by looking in this set
         void replace_or_register(DawgNode *d);
         bool has_children(DawgNode *d) const;
         void build_dawg();
